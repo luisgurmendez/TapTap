@@ -1,22 +1,107 @@
 <!DOCTYPE html>
-<link href="/ingSoftDemo/app/styles/bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="/ingSoftwareDemo/ingSoftDemo/app/styles/bootstrap/css/bootstrap.min.css">
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Demo</title>
 </head>
 <body>
-  <h1 id="caca">caca</h1>
+  <h1>Demo</h1>
+  <div class="container">
+    <span class="timer">0.0</span>
+  </div>
+  <table id="tablero">
+  </table>
+
+
 </body>
-<script>
-  var caca=document.getElementById("caca")
-  console.log(caca)
-</script>
-<style>
-  #caca{
-    color: blue
-  }
-</style>
 </html>
-<script src="/ingSoftDemo/app/scripts/jquery-2.2.2.js"></script>
-<script src="/ingSoftDemo/app/scripts/bootstrap/js/bootstrap.js"></script>
+
+<style>
+
+  .punto{
+    height: 100px;
+    width: 100px;
+    border-style: solid;
+    border-width: 0px;
+    border-color: transparent;
+  }
+
+  .punto > div{
+    background: #bbbbbb;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+  }
+
+</style>
+<script src="/ingSoftwareDemo/ingSoftDemo/app/scripts/jquery-2.2.2.js"></script>
+<script src="/ingSoftwareDemo/ingSoftDemo/app/scripts/bootstrap/js/bootstrap.js"></script>
+
+<script>
+
+
+  $(document).ready(function() {
+    var puntoHTML = '<div class="punto"><div></div></div>'
+    var tablero=$('#tablero')
+
+    function crearTablero(tamaño){
+
+      var tableHTML=""
+
+      for (i=0; i<tamaño; i++ ){
+        tableHTML +="<tr>"
+        for (j=0; j<tamaño;j++){
+          tableHTML +="<td data-x='" + j + "' data-y='" + i + "'>" + puntoHTML + "</td>"
+        }
+        tableHTML +="</tr>"
+      }
+      tablero.append(tableHTML)
+    }
+
+    crearTablero(10);
+
+
+    function ajaxRequestAddMeToQueue() {
+      $.ajax({
+        type: "POST",
+        data: {'user_id': 'id'},
+        url: "/juego/addMeToQueue",
+        success: function (data) {
+          crearTablero(data['tamaño'])
+        }
+      });
+    }
+
+    function ajaxRequestSendPoint(x,y){
+      $.ajax({
+        type: "POST",
+        data: {'x': x, 'y':y},
+        url: "/juego/paintPoint",
+        success: function(data){
+
+          
+
+
+        }
+      })
+    }
+
+    tablero.on('click','.punto',function(){
+      punto = $(this)
+      cell = punto.parents('td')[0];
+      punto.children().css('background','red')
+
+
+
+    });
+
+  });
+
+
+
+
+
+</script>
+
+
