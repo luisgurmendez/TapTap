@@ -6,12 +6,14 @@
     <title>Demo</title>
 </head>
 <body>
-  <h1>Demo</h1>
-  <div class="container">
-    <span class="timer">0.0</span>
+  <h1 align="center">Demo</h1>
+  <hr class="styled">
+  <div>
+    <span>00:<span id="timer">0</span> s</span>
   </div>
-  <table id="tablero">
+  <table style="margin:0 auto;" id="board">
   </table>
+
 
 
 </body>
@@ -19,20 +21,56 @@
 
 <style>
 
-  .punto{
-    height: 100px;
-    width: 100px;
+  div{
+    text-align: center;
+  }
+
+  span{
+    font-size: 50px;
+  }
+
+  hr.styled{
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+  }
+
+  h1{
+    font-size: 70px;
+    color: #8190ff;
+    margin:0 auto;
+  }
+
+  .point{
+    height: 90px;
+    width: 90px;
     border-style: solid;
     border-width: 0px;
     border-color: transparent;
   }
 
-  .punto > div{
+  .point > div{
     background: #bbbbbb;
-    width: 100px;
-    height: 100px;
+    height: 95%;
+    width: 95%;
     border-radius: 50%;
   }
+
+  @media screen and (max-width: 480px) {
+    .point{
+      height: 60px;
+      width: 60px;
+    }
+
+    h1{
+      font-size: 40px;
+    }
+
+    span{
+      font-size: 20px;
+    }
+  }
+
 
 </style>
 <script src="/ingSoftwareDemo/ingSoftDemo/app/scripts/jquery-2.2.2.js"></script>
@@ -41,34 +79,36 @@
 <script>
 
 
-  $(document).ready(function() {
-    var puntoHTML = '<div class="punto"><div></div></div>'
-    var tablero=$('#tablero')
 
-    function crearTablero(tamaño){
+  $(document).ready(function() {
+    var pointHTML = '<div class="point"><div></div></div>'
+    var board=$('#board')
+    var boardSize = 5;
+
+    function generateBoard(size){
 
       var tableHTML=""
 
-      for (i=0; i<tamaño; i++ ){
+      for (i=0; i<size; i++ ){
         tableHTML +="<tr>"
-        for (j=0; j<tamaño;j++){
-          tableHTML +="<td data-x='" + j + "' data-y='" + i + "'>" + puntoHTML + "</td>"
+        for (j=0; j<size;j++){
+          tableHTML +="<td data-x='" + j + "' data-y='" + i + "'>" + pointHTML + "</td>"
         }
         tableHTML +="</tr>"
       }
-      tablero.append(tableHTML)
+      board.append(tableHTML)
     }
 
-    crearTablero(10);
+    generateBoard(boardSize);
 
 
     function ajaxRequestAddMeToQueue() {
       $.ajax({
         type: "POST",
         data: {'user_id': 'id'},
-        url: "/juego/addMeToQueue",
+        url: "/game/addMeToQueue",
         success: function (data) {
-          crearTablero(data['tamaño'])
+          generateBoard(data['tamaño'])
         }
       });
     }
@@ -76,30 +116,47 @@
     function ajaxRequestSendPoint(x,y){
       $.ajax({
         type: "POST",
-        data: {'x': x, 'y':y},
-        url: "/juego/paintPoint",
+        data: {'x': x, 'y':y,'user_id':'user_id'},
+        url: "/game/paintPoint",
         success: function(data){
-
-          
-
-
         }
       })
     }
 
-    tablero.on('click','.punto',function(){
-      punto = $(this)
-      cell = punto.parents('td')[0];
-      punto.children().css('background','red')
-
-
-
+    board.on('click','.point',function(){
+      point = $(this)
+      cell = point.parents('td')[0];
+      point.children().css('background','#fb5041')
+      cell = $(cell)
+      console.log("x: " + cell.data('x') + "\ny: " + cell.data('y'))
     });
 
   });
 
+  function determineWinner(){
+    alert("Somebody won")
 
+  }
 
+  function timer(time){
+    var counter = time;
+
+    setInterval(function() {
+      counter--;
+      if (counter >= 0) {
+        $('#timer').text(counter);
+      }
+      if (counter === 0) {
+        determineWinner();
+        clearInterval();
+      }
+      console.log(counter)
+
+    }, 1000);
+
+  }
+
+  //timer(6)
 
 
 </script>
