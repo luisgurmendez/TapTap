@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<link rel="stylesheet" href="/ingSoftwareDemo/ingSoftDemo/app/styles/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="/ingSoftDemo/app/styles/bootstrap/css/bootstrap.min.css">
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -73,24 +74,51 @@
 
 
 </style>
-<script src="/ingSoftwareDemo/ingSoftDemo/app/scripts/jquery-2.2.2.js"></script>
+<script src="/ingSoftDemo/app/scripts/jquery-2.2.2.js"></script>
+<script src="/ingSoftDemo/app/scripts/jquery.mobile-1.4.5.js"></script>
 <script>
 
 
-  window.addEventListener('click', function(e) {
-    e.preventDefault();
-    console.log("CLICK")
-  }, false);
 
-  // listen for touches
-  window.addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    // the event object has an array
-    // called touches, we just want
-    // the first touch
-    console.log("touchStart")
+  //var wsUri = "ws://localhost:8080/websocket-example/echo";
 
-  }, false);
+  var websocket;
+
+  function send_message() {
+    websocket = new WebSocket(wsUri);
+    websocket.onopen = function(evt) {
+      onOpen(evt)
+    };
+    websocket.onmessage = function(evt) {
+      onMessage(evt)
+    };
+    websocket.onerror = function(evt) {
+      onError(evt)
+    };
+  }
+  function onOpen(evt) {
+    websocket= new WebSocket(wsUri)
+  }
+  function onMessage(evt) {
+    writeToScreen("Message Received: " + evt.data);
+  }
+  function onError(evt) {
+    writeToScreen('ERROR: ' + evt.data);
+  }
+  function doSend(message) {
+    writeToScreen("Message Sent: " + message);
+    websocket.send(message);
+    //websocket.close();
+  }
+  function writeToScreen(message) {
+    var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message;
+
+    output.appendChild(pre);
+  }
+
+
   window.addEventListener('touchmove', function(e) {
     // we're not interested in this
     // but prevent default behaviour
@@ -100,17 +128,15 @@
     console.log("touchmove")
     console.log(e)
   }, false);
-  window.addEventListener('touchend', function(e) {
-    // as above
-    e.preventDefault();
-    console.log("touchend")
-  }, false);
+
+
 
   $(document).ready(function() {
     var pointHTML = '<div class="point"><div></div></div>'
     var board=$('#board')
     var boardSize = 5;
 
+    // Populate table with point DOMs
     function generateBoard(size){
 
       var tableHTML=""
@@ -125,21 +151,19 @@
       board.append(tableHTML)
     }
 
-    generateBoard(boardSize);
+    generateBoard(10);
 
 
-    function ajaxRequestAddMeToQueue() {
-
-
-    }
-
-    function ajaxRequestSendPoint(x,y){
-
+    function addMeToQueue() {
 
 
     }
 
-    board.on('click','.point',function(){
+    function sendPoint(x,y){
+
+    }
+
+    board.on('tap','.point',function(){
       point = $(this)
       cell = point.parents('td')[0];
       point.children().css('background','#fb5041')
@@ -166,13 +190,37 @@
         determineWinner();
         clearInterval();
       }
-      console.log(counter)
 
     }, 1000);
 
   }
 
-  //timer(6)
+  //timer(6);
+
+
+  // Disable double tap-zoom
+  (function($) {
+    var count = 0;
+    $.fn.nodoubletapzoom = function() {
+      $(this).bind('touchstart', function preventZoom(e){
+        var t2 = e.timeStamp;
+        var t1 = $(this).data('lastTouch') || t2;
+        var dt = t2 - t1;
+        var fingers = e.originalEvent.touches.length;
+        $(this).data('lastTouch', t2);
+        if (!dt || dt > 500 || fingers > 1){
+          return; // not double-tap
+        }
+        e.preventDefault(); // double tap - prevent the zoom
+        // also synthesize click events we just swallowed up
+        $(e.target).trigger('tap');
+      });
+    };
+  })(jQuery);
+
+  $(document).on('pageinit',"body", function() {
+    $("body").nodoubletapzoom();
+  });
 
 
 </script>
