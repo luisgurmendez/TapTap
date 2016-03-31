@@ -80,23 +80,19 @@
 
 
 
-  //var wsUri = "ws://localhost:8080/websocket-example/echo";
+  var wsUri = "ws://localhost:8080/Game/gameWS";
 
   var websocket;
   var user_id;
   var self_color;
   var can_play=false
+  colors={'Red':'#fb5041','Blue':"#1968ff"}
 
 
   function setColor(color){
-
-    if(color=="Red"){
-      self_color='#fb5041'
-    }else if(color=="Blue"){
-      self_color="#1968ff"
-    }
+    self_color = colors[color]
   }
-  
+
   function startGame(time,matrixSize){
     generateBoard(matrixSize)
     can_play=true
@@ -104,7 +100,7 @@
 
   }
 
-  function send_message() {
+/*  function send_message() {
     websocket = new WebSocket(wsUri);
     websocket.onopen = function(evt) {
       onOpen(evt)
@@ -115,26 +111,30 @@
     websocket.onerror = function(evt) {
       onError(evt)
     };
-  }
+  }*/
+
   function onOpen(evt) {
     websocket= new WebSocket(wsUri)
   }
+
   function onMessage(evt) {
 
     action = evt.data.action
     if(action=="paintedSpot"){
-      paintSpot(evt.data.x,evt.data.y,color)
+      paintSpot(evt.data.x,evt.data.y,evt.data.color)
     }else if(action=="startGame"){
       user_id = evt.data.user_id
       setColor(evt.data.color)
       startGame(evt.data.time,evt.data.matrixSize)
+    }else if(action=='timeIsOver'){
+      endGame()
     }
   }
   function onError(evt) {
     alert("An error has occurred")
   }
   function doSend(message) {
-    websocket.send(message);
+    websocket.send(JSON.stringify(message));
     //websocket.close();
   }
 
@@ -171,12 +171,13 @@
       board.append(tableHTML)
     }
 
-    generateBoard(10);
+    generateBoard(boardSize);
 
 
-    function addMeToQueue() {
-
-
+    function endGame(){
+      can_play=false
+      determineWinner()
+      websocket.close()
     }
 
     function sendPoint(x,y){
@@ -185,26 +186,30 @@
       doSend(message)
     }
 
-    function paintSpot(cell){
-      point.children().css('background',self_color)
+    function paintSpot(x,y,color){
+      $($('#board')[0].rows[x].cells[y]).children().children().css('background-color',colors[color]);
     }
 
     board.on('tap','.point',function(){
-      point = $(this)
+      point = $(this);
       if(can_play){
         cell = point.parents('td')[0];
-        paintSpot(cell)
-        sendPoint(cell.data('x'),cell.data('y'))
+        paintSpot(cell);
+        sendPoint(cell.data('x'),cell.data('y'));
       }else{
-        alert("The game is already over")
+        alert("You are not playing");
       }
     });
 
   });
 
   function determineWinner(){
-    alert("Somebody won")
+    alert("Somebody won");
+  }
 
+  function sendGameOver(){
+    message={'action':'timeIsOver'};
+    doSend(message);
   }
 
   function timer(time){
@@ -216,8 +221,8 @@
         $('#timer').text(counter);
       }
       if (counter === 0) {
-        determineWinner();
-        can_play=false
+        sendGameOver();
+        endGame();
         clearInterval();
       }
 
@@ -225,7 +230,7 @@
 
   }
 
-  //timer(6);
+  onOpen()
 
 
   // Disable double tap-zoom
