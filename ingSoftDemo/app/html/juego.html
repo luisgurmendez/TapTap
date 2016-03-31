@@ -83,6 +83,26 @@
   //var wsUri = "ws://localhost:8080/websocket-example/echo";
 
   var websocket;
+  var user_id;
+  var self_color;
+  var can_play=false
+
+
+  function setColor(color){
+
+    if(color=="Red"){
+      self_color='#fb5041'
+    }else if(color=="Blue"){
+      self_color="#1968ff"
+    }
+  }
+  
+  function startGame(time,matrixSize){
+    generateBoard(matrixSize)
+    can_play=true
+    timer(time)
+
+  }
 
   function send_message() {
     websocket = new WebSocket(wsUri);
@@ -100,22 +120,22 @@
     websocket= new WebSocket(wsUri)
   }
   function onMessage(evt) {
-    writeToScreen("Message Received: " + evt.data);
+
+    action = evt.data.action
+    if(action=="paintedSpot"){
+      paintSpot(evt.data.x,evt.data.y,color)
+    }else if(action=="startGame"){
+      user_id = evt.data.user_id
+      setColor(evt.data.color)
+      startGame(evt.data.time,evt.data.matrixSize)
+    }
   }
   function onError(evt) {
-    writeToScreen('ERROR: ' + evt.data);
+    alert("An error has occurred")
   }
   function doSend(message) {
-    writeToScreen("Message Sent: " + message);
     websocket.send(message);
     //websocket.close();
-  }
-  function writeToScreen(message) {
-    var pre = document.createElement("p");
-    pre.style.wordWrap = "break-word";
-    pre.innerHTML = message;
-
-    output.appendChild(pre);
   }
 
 
@@ -160,15 +180,24 @@
     }
 
     function sendPoint(x,y){
+      message={action:"paintSpot",x:x,y:y,user_id:user_id}
+      console.log(message)
+      doSend(message)
+    }
 
+    function paintSpot(cell){
+      point.children().css('background',self_color)
     }
 
     board.on('tap','.point',function(){
       point = $(this)
-      cell = point.parents('td')[0];
-      point.children().css('background','#fb5041')
-      cell = $(cell)
-      console.log("x: " + cell.data('x') + "\ny: " + cell.data('y'))
+      if(can_play){
+        cell = point.parents('td')[0];
+        paintSpot(cell)
+        sendPoint(cell.data('x'),cell.data('y'))
+      }else{
+        alert("The game is already over")
+      }
     });
 
   });
@@ -188,6 +217,7 @@
       }
       if (counter === 0) {
         determineWinner();
+        can_play=false
         clearInterval();
       }
 
