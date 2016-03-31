@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<link rel="stylesheet" href="/ingSoftDemo/app/styles/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="bootstrap.min.css">
 
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Demo</title>
+  <meta charset="UTF-8">
+  <title>Demo</title>
 </head>
 <body>
-  <h1 align="center">Demo</h1>
-  <hr class="styled">
-  <div>
-    <span>00:<span id="timer">0</span> s</span>
-  </div>
-  <table style="margin:0 auto;" id="board">
-  </table>
+<h1 align="center">Demo</h1>
+<hr class="styled">
+<div>
+  <span>00:<span id="timer">0</span> s</span>
+</div>
+<table style="margin:0 auto;" id="board">
+</table>
 
 
 
@@ -74,8 +74,8 @@
 
 
 </style>
-<script src="/ingSoftDemo/app/scripts/jquery-2.2.2.js"></script>
-<script src="/ingSoftDemo/app/scripts/jquery.mobile-1.4.5.js"></script>
+<script src="jquery-2.2.2.js"></script>
+<script src="jquery.mobile-1.4.5.js"></script>
 <script>
 
 
@@ -85,47 +85,66 @@
   var websocket;
   var user_id;
   var self_color;
+  var opponent_color;
   var can_play=false
-  colors={'Red':'#fb5041','Blue':"#1968ff"}
-
+  colors={'Red':'#fb5041','Blue':"#1968ff",'#fb5041':'#fb5041',"#1968ff":"#1968ff"}
+  reverse_colors={'#fb5041':'#1968ff',"#1968ff":"#fb5041"}
 
   function setColor(color){
-    self_color = colors[color]
+    self_color = colors[color];
+    opponent_color = reverse_colors[self_color];
   }
 
-  function startGame(time,matrixSize){
+  // Populate table with point DOMs
+  function generateBoard(size){
+
+    var tableHTML=""
+
+    for (i=0; i<size; i++ ){
+      tableHTML +="<tr>"
+      for (j=0; j<size;j++){
+        tableHTML +="<td data-x='" + j + "' data-y='" + i + "'>" + pointHTML + "</td>"
+      }
+      tableHTML +="</tr>"
+    }
+    board.append(tableHTML)
+  }
+
+  function startGame(time,matrixSize,userId){
     generateBoard(matrixSize)
+    user_id=userId
     can_play=true
     timer(time)
-
   }
 
-/*  function send_message() {
-    websocket = new WebSocket(wsUri);
+  function startConnection() {
+    websocket= new WebSocket(wsUri)
     websocket.onopen = function(evt) {
-      onOpen(evt)
+
     };
     websocket.onmessage = function(evt) {
-      onMessage(evt)
+      onMessage(evt);
     };
     websocket.onerror = function(evt) {
-      onError(evt)
+      onError();
     };
-  }*/
-
-  function onOpen(evt) {
-    websocket= new WebSocket(wsUri)
+    websocket.onclose = function(evt){
+      console.log('Web socket closed')
+      endGame();
+    };
   }
 
-  function onMessage(evt) {
+  startConnection();
 
-    action = evt.data.action
+  function onMessage(evt) {
+    json = JSON.parse(evt.data);
+    action = json.action
     if(action=="paintedSpot"){
-      paintSpot(evt.data.x,evt.data.y,evt.data.color)
+      paintSpot(json.x,json.y,json.color)
     }else if(action=="startGame"){
-      user_id = evt.data.user_id
-      setColor(evt.data.color)
-      startGame(evt.data.time,evt.data.matrixSize)
+      console.log(json)
+      setColor(json.color)
+      startGame(json.time,json.matrixSize,json.userId)
     }else if(action=='timeIsOver'){
       endGame()
     }
@@ -151,61 +170,68 @@
 
 
 
-  $(document).ready(function() {
-    var pointHTML = '<div class="point"><div></div></div>'
-    var board=$('#board')
-    var boardSize = 5;
 
-    // Populate table with point DOMs
-    function generateBoard(size){
+  var pointHTML = '<div class="point"><div></div></div>'
+  var board=$('#board')
+  var boardSize = 5;
 
-      var tableHTML=""
 
-      for (i=0; i<size; i++ ){
-        tableHTML +="<tr>"
-        for (j=0; j<size;j++){
-          tableHTML +="<td data-x='" + j + "' data-y='" + i + "'>" + pointHTML + "</td>"
-        }
-        tableHTML +="</tr>"
-      }
-      board.append(tableHTML)
+  function endGame(){
+    can_play=false
+    determineWinner()
+    websocket.close()
+  }
+
+  function sendPoint(x,y){
+    message={'action':"paintSpot",'x':x,'y':y,'userId':user_id}
+    console.log(message)
+    doSend(message)
+  }
+
+  function paintSpot(x,y,color){
+    $($('#board')[0].rows[y].cells[x]).children().children().css('background-color',colors[color]);
+    if(colors[color] == self_color){
+      $($('#board')[0].rows[y].cells[x]).children().children().data('color',self_color)
+    }else{
+      $($('#board')[0].rows[y].cells[x]).children().children().data('color',opponent_color)
     }
+    console.log($($('#board')[0].rows[y].cells[x]).children().children().data())
+  }
 
-    generateBoard(boardSize);
-
-
-    function endGame(){
-      can_play=false
-      determineWinner()
-      websocket.close()
+  board.on('tap','.point',function(){
+    point = $(this);
+    if(can_play){
+      cell = $(point.parents('td')[0]);
+      paintSpot(cell.data('x'),cell.data('y'),self_color);
+      sendPoint(cell.data('x'),cell.data('y'));
+    }else{
+      alert("You are not playing");
     }
-
-    function sendPoint(x,y){
-      message={action:"paintSpot",x:x,y:y,user_id:user_id}
-      console.log(message)
-      doSend(message)
-    }
-
-    function paintSpot(x,y,color){
-      $($('#board')[0].rows[x].cells[y]).children().children().css('background-color',colors[color]);
-    }
-
-    board.on('tap','.point',function(){
-      point = $(this);
-      if(can_play){
-        cell = point.parents('td')[0];
-        paintSpot(cell);
-        sendPoint(cell.data('x'),cell.data('y'));
-      }else{
-        alert("You are not playing");
-      }
-    });
-
   });
 
   function determineWinner(){
-    alert("Somebody won");
+    mine=0
+    his=0
+    $('#board tr').each(function(){
+      $('td').each(function(){
+        point=$(this).children().children()
+        if(point.data('color')== self_color){
+          mine+=1
+        }else if(point.data('color')== opponent_color){
+
+          his+=1
+        }
+      })
+    });
+    if(mine > his) {
+      alert('You won!')
+    }else if(mine < his){
+      alert('You lose!')
+    }else{
+      alert('Draw!')
+    }
   }
+
 
   function sendGameOver(){
     message={'action':'timeIsOver'};
@@ -229,9 +255,6 @@
     }, 1000);
 
   }
-
-  onOpen()
-
 
   // Disable double tap-zoom
   (function($) {
@@ -259,5 +282,3 @@
 
 
 </script>
-
-
