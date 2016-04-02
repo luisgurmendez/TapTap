@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<link rel="stylesheet" href="bootstrap.min.css">
+<link rel="stylesheet" href="styles/bootstrap.min.css">
 
 <html lang="en">
 <head>
@@ -85,13 +85,15 @@
 
 
 </style>
-<script src="jquery-2.2.2.js"></script>
-<script src="jquery.mobile-1.4.5.js"></script>
+<script src="scripts/plugins/jquery-2.2.2.js"></script>
+<script src="scripts/plugins/jquery.mobile-1.4.5.js"></script>
+<script src="scripts/plugins/chart.min.js"></script>
+<script src="scripts/data_controller.js"></script>
 <script>
 
 
 
-  var wsUri = "ws://192.168.1.9:8080/Game/gameWS";
+  var wsUri = "ws://192.168.1.46:8080/Game/gameWS";
   
   var websocket;
   var user_id;
@@ -101,10 +103,7 @@
   var colors={'Red':'#fb5041','Blue':"#1968ff",'#fb5041':'#fb5041',"#1968ff":"#1968ff"}
   var reverse_colors={'#fb5041':'#1968ff',"#1968ff":"#fb5041"}
   var alerted=false
-  var my_timeline_count=[];
-  var opponent_timeline_count=[];
-  var my_point_count=0;
-  var opponent_point_count=0
+ 
   
   //Set nicer colors that server sends
   function setColor(color){
@@ -167,8 +166,6 @@
 	json = JSON.parse(evt.data);
     action = json.action
     if(action=="paintedSpot"){
-      opponent_point_count++;
-      opponent_timeline_count.push([opponent_point_count,new Date()])
       paintSpot(json.x,json.y,json.color)
     }else if(action=="startGame"){
       setColor(json.color)
@@ -222,12 +219,23 @@
    // Change point background
    function paintSpot(x,y,color){
 	   
-	 my_point_count--;
-     $($('#board')[0].rows[y].cells[x]).children().children().css('background-color',colors[color]);
+	 var point = $($('#board')[0].rows[y].cells[x]).children().children()  
+     point.css('background-color',colors[color]);
      if(colors[color] == self_color){
-    	  $($('#board')[0].rows[y].cells[x]).children().children().data('color',self_color)
+    	  if(point.data('color')==opponent_color){
+    		  dataController.selfPainted(true)
+    	  }else if(point.data('color') != self_color){
+    		  dataController.selfPainted(false)
+    	  }
+    	  point.data('color',self_color)
+    	  
      }else{
-    	  $($('#board')[0].rows[y].cells[x]).children().children().data('color',opponent_color)
+    		if(point.data('color')==self_color){
+   		  		dataController.opponentPainted(true)
+   	  		}else if(point.data('color') != opponent_color){
+   		  		dataController.opponentPainted(false)
+   	  		}
+    	  point.data('color',opponent_color)
      }
    
    }
@@ -239,9 +247,6 @@
        cell = $(point.parents('td')[0]);
        paintSpot(cell.data('x'),cell.data('y'),self_color);
        sendPoint(cell.data('x'),cell.data('y'));
-       my_point_count++;
-       opponent_point_count--;
-       my_timeline_count.push([my_point_count,new Date()])
      }else{
        alert("You are not playing");
      }
@@ -250,9 +255,9 @@
    
    // Logic to determining winner
    function determineWinner(){
-	   mine=0
-	   his=0
-	   $('#board tr').each(function(){
+	   mine=dataController.my_point_count
+	   his=dataController.opponent_point_count
+	  /*  $('#board tr').each(function(){
 	     $('td').each(function(){
 	       point=$(this).children().children()
 	       if(point.data('color')== self_color){
@@ -261,7 +266,7 @@
 	         his+=1
 	       }
 	     })
-	   });
+	   }); */
 	   if(mine > his) {
 		   if(!alerted){
 	    		alert("You won!");
