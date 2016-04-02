@@ -14,6 +14,18 @@ This is a repo for the students of Universidad de Montevideo.
 5.Open Eclipse in the workspace folder
 
 6.In the Project Explorer tab, right click > Import > General > Existing Project into WorkSpace > Browse > ../YourWorkSpaceFolder/Game > Finish 
+
+
+
+### To Deploy Locally
+
+1.In eclipse right click juego.html
+
+2.Run As > Run on Server
+
+3.If first time Manually define new server > Apache > Tomcat v8.0 Server > Finish
+
+4.Browse the folder of apache-tomcat-8 > finish
 	
 
 
