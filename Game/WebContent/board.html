@@ -257,6 +257,7 @@
    function determineWinner(){
 	   mine=dataController.my_point_count
 	   his=dataController.opponent_point_count
+	   
 	  /*  $('#board tr').each(function(){
 	     $('td').each(function(){
 	       point=$(this).children().children()
@@ -267,6 +268,7 @@
 	       }
 	     })
 	   }); */
+	   
 	   if(mine > his) {
 		   if(!alerted){
 	    		alert("You won!");
