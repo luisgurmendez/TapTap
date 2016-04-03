@@ -19,13 +19,15 @@ This is a repo for the students of Universidad de Montevideo.
 
 ### To Deploy Locally
 
-1.In eclipse right click juego.html
+1.Change "ip" of  ws://ip:8080/Game/gameWS in board.html to your private ip (ipconfig in windows cmd || ifconfig in osx terminal)
 
-2.Run As > Run on Server
+2.In eclipse right click board.html
 
-3.If first time Manually define new server > Apache > Tomcat v8.0 Server > Finish
+3.Run As > Run on Server
 
-4.Browse the folder of apache-tomcat-8 > finish
+4.If first time Manually define new server > Apache > Tomcat v8.0 Server > Finish
+
+5.Browse the folder of apache-tomcat-8 > finish
 	
 
 
