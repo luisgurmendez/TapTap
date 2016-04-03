@@ -221,6 +221,9 @@
      determineWinner()
      websocket.close()
      drawPlot();
+     $('html body').animate({
+         scrollTop: $("#flot-placeholder").offset().top
+     }, 2000);
    }
    
    //Send painted point data through websocket
@@ -261,7 +264,7 @@
        paintSpot(cell.data('x'),cell.data('y'),self_color);
        sendPoint(cell.data('x'),cell.data('y'));
      }else{
-       alert("You are not playing");
+       $('#board').hide()
      }
    });
    
