@@ -16,7 +16,8 @@
   <table style="margin:0 auto;" id="board">
   </table>
   
- 
+  <div id="flot-placeholder"  hidden></div>
+
  
 
 </body>
@@ -24,6 +25,10 @@
 
 <style>
 
+
+  #flot-placeholder{
+  	margin: 0 auto;
+  }
  
   body{ 
   	background-color: rgba(0, 0, 0, 0.25);
@@ -89,10 +94,8 @@
 <script src="scripts/plugins/jquery-2.2.2.js"></script>
 <script src="scripts/plugins/jquery.mobile-1.4.5.js"></script>
 <script language="javascript" type="text/javascript" src="scripts/plugins/flot/jquery.flot.js"></script>
-<script language="javascript" type="text/javascript" src="scripts/plugins/flot/jquery.flot.time.js"></script>
 <script src="scripts/data_controller.js"></script>
 <script>
-
 
 
   var wsUri = "ws://192.168.1.46:8080/Game/gameWS";
@@ -105,6 +108,10 @@
   var colors={'Red':'#fb5041','Blue':"#1968ff",'#fb5041':'#fb5041',"#1968ff":"#1968ff"}
   var reverse_colors={'#fb5041':'#1968ff',"#1968ff":"#fb5041"}
   var alerted=false
+  var plot;
+  var windows_height;
+  var windows_width;
+  var can_zoom =false;
  
   
   //Set nicer colors that server sends
@@ -192,7 +199,9 @@
     // but prevent default behaviour
     // so the screen doesn't scroll
     // or zoom
-    e.preventDefault();
+    if(!can_zoom){
+    	e.preventDefault();	
+    }
     console.log("touchmove")
     console.log(e)
   }, false);
@@ -208,8 +217,10 @@
    //Called whenever the game ends (timer off, otherplayer disconnects, etc)
    function endGame(){
      can_play=false
+     can_zoom=true;
      determineWinner()
      websocket.close()
+     drawPlot();
    }
    
    //Send painted point data through websocket
@@ -328,7 +339,10 @@
         if (!dt || dt > 500 || fingers > 1){
           return; // not double-tap
         }
-        e.preventDefault(); // double tap - prevent the zoom
+        if(!can_zoom){
+        	e.preventDefault();	
+        }
+         // double tap - prevent the zoom
         // also synthesize click events we just swallowed up
         $(e.target).trigger('tap');
       });
@@ -360,11 +374,37 @@
 	}	
 		
 	
-	
-	
-	
-	
-	
+	function drawPlot(){
+		min_size= (windows_width > windows_height) ? windows_height : windows_width;
+		$('#flot-placeholder').css('width',min_size);
+		$('#flot-placeholder').css('height',min_size);
+		plot = $.plot($("#flot-placeholder"), [],{
+		    xaxis:{
+		    	show:false
+		      },
+		    colors: [self_color,opponent_color]
+		    }); 
+		my_data=dataController.my_timeline_count;
+		opponent_data=dataController.opponent_timeline_count
+		data=  [{
+	    	data:my_data,
+	    	lines:{show:true,fill:true},
+	    	label: "Me"
+	    },
+	    {
+	    	data:opponent_data,
+	    	lines:{show:true,fill:true},
+	    	label: "Him"
+	    }]
+		plot.setData(data)
+		plot.setupGrid()
+		plot.draw()
+		$('#flot-placeholder').show()
+		
+	}
+		
+		
+	 
 
 	
 </script>

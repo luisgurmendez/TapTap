@@ -13,14 +13,16 @@ dataController = {
 				this.my_point_count--;
 			}
 			this.opponent_point_count++;
-		    this.opponent_timeline_count.push([new Date(),this.opponent_point_count])
+		    this.opponent_timeline_count.push([new Date().getTime() * 1000,this.opponent_point_count])
+		    this.my_timeline_count.push([new Date().getTime() * 1000,this.my_point_count])
 		},
 		selfPainted: function(wasOpponents){
 			if(wasOpponents){
 				this.opponent_point_count--;
 			}
 			this.my_point_count++;
-			this.my_timeline_count.push([new Date(),this.my_point_count])
+			this.my_timeline_count.push([new Date().getTime() * 1000,this.my_point_count])
+			this.opponent_timeline_count.push([new Date().getTime() * 1000,this.opponent_point_count])
 		},
 		
 
