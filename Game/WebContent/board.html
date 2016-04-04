@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<link rel="stylesheet" href="styles/bootstrap.min.css">
+
+
 
 <html lang="en">
 <head>
@@ -25,6 +26,10 @@
 
 <style>
 
+
+*{
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
 
   #flot-placeholder{
   	margin: 0 auto;
@@ -94,11 +99,12 @@
 <script src="scripts/plugins/jquery-2.2.2.js"></script>
 <script src="scripts/plugins/jquery.mobile-1.4.5.js"></script>
 <script language="javascript" type="text/javascript" src="scripts/plugins/flot/jquery.flot.js"></script>
+<script src="scripts/plugins/flot/curvedLines.js"></script>
 <script src="scripts/data_controller.js"></script>
 <script>
 
 
-  var wsUri = "ws://192.168.1.46:8080/Game/gameWS";
+  var wsUri = "ws://10.252.254.2:8080/Game/gameWS";
   
   var websocket;
   var user_id;
@@ -385,7 +391,14 @@
 		    xaxis:{
 		    	show:false
 		      },
-		    colors: [self_color,opponent_color]
+		    colors: [self_color,opponent_color],
+		    series: {
+                curvedLines: {
+                         apply: true,
+                         active: true,
+                         monotonicFit: true
+                }
+            }
 		    }); 
 		my_data=dataController.my_timeline_count;
 		opponent_data=dataController.opponent_timeline_count
