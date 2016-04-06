@@ -5,15 +5,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
     <title id="title">Demo</title>
 </head>
 <body>
   <h1 align="center">Demo</h1>
-  <hr class="styled">
-  <div>
+  <hr class="styled"> 
+  <div  id="timer_container" hidden>
     <span id="timer_span">00:<span id="timer">0</span> s</span>
   </div>
-  <img id="loading" src="loading.gif"></img>
+  
+  <div id="pre_game_container">
+  	<div id="pre_game_point_container">
+	  <div id="self_color_select" class="point pre_game_point">
+	  	<div></div>
+	  </div>
+	  <div id="opponent_color_select" class="point pre_game_point">
+	  	<div id="opponent_point_div">
+	  		
+	  	</div>
+	  	<span id="waiting_player">Waiting for other player...</span>
+	  </div>
+	</div>
+	  <div id="color_select_container">
+	  	<div class="color_selector"  data-color="red" data-color-hex="#fb5041"></div>
+	  	<div class="color_selector"  data-color="blue" data-color-hex="#1968ff"></div>
+	  	<div class="color_selector"  data-color="green" data-color-hex="#86F296"></div>
+	  	<div class="color_selector"  data-color="yellow" data-color-hex="#F9FB89"></div>
+	  	<div class="color_selector"  data-color="violet" data-color-hex="#FF6DE3"></div>
+	  </div>
+	  
+	  
+	  <button id="ready_to_play">Start!</button>
+	  
+  </div>
   <table style="margin:0 auto;" id="board">
   </table>
   
@@ -31,12 +56,43 @@
     -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
-  #flot-placeholder{
-  	margin: 0 auto;
+  #opponent_color_select{float: left;}
+  
+  #opponent_point_div{
+	  background:url(ajax-loader.gif) no-repeat center center;
+	  background-size: cover;
   }
- 
-  body{ 
-  	background-color: rgba(0, 0, 0, 0.25);
+  
+  #pre_game_point_container{display: inline-flex;}
+  
+  #ready_to_play{
+  
+  }
+  
+  .color_selector{
+  	width: 50px;
+  	height: 50px;
+  	float: left;
+  	margin: 2px;
+  	border-radius: 20%;
+  
+  }
+  
+  
+  .selected{
+  	border: solid 5px blue;
+  }
+  
+  
+  
+  #color_select_container{
+  	display:inline-block;
+  	margin-top: 50px;	
+  }
+  .pre_game_point{padding-bottom: 100px;}
+
+  #flot-placeholder, #self_color_select,#color_select_container{
+  	margin: 0 auto;
   }
   
   #loading{
@@ -48,7 +104,7 @@
     text-align: center;
   }
 
-  span{
+  #timer_span,#timer{
     font-size: 50px;
   }
 
@@ -104,26 +160,37 @@
 <script>
 
 
-  var wsUri = "ws://10.252.254.2:8080/Game/gameWS";
+  var wsUri = "ws://192.168.1.45:8080/Game/gameWS";
   
   var websocket;
   var user_id;
-  var self_color;
+  var opponent_id;
+  var self_color=null;
   var opponent_color;
   var can_play=false
-  var colors={'Red':'#fb5041','Blue':"#1968ff",'#fb5041':'#fb5041',"#1968ff":"#1968ff"}
-  var reverse_colors={'#fb5041':'#1968ff',"#1968ff":"#fb5041"}
   var alerted=false
   var plot;
   var windows_height;
   var windows_width;
   var can_zoom =false;
- 
+  var boardSize;
+  var time;
+  var colors=['#fb5041',"#1968ff","#86F296","#F9FB89","#FF6DE3"]
+  var user_color={}
+  
   
   //Set nicer colors that server sends
-  function setColor(color){
-    self_color = colors[color];
-    opponent_color = reverse_colors[self_color];
+  function setOpponentColor(color){
+   
+	  opponent_color = color;
+	  while(opponent_color == color){
+		  opponent_color=colors[Math.floor(Math.random() * colors.length)];
+		  user_color[opponent_id]=opponent_color;
+		  
+	  }
+	  
+	  
+	  
   }
 
   // Populate table with point DOMs
@@ -142,23 +209,24 @@
   }
   
   //Called to generateBoard and set timer, and other details.
-  function startGame(time,matrixSize,userId){
-    generateBoard(matrixSize)
-    user_id=userId
+  function startGame(){
+    generateBoard(boardSize)
     can_play=true
     timer(time)
-    reSizePoints(matrixSize)
+    reSizePoints(boardSize)
+    setOpponentColor(self_color)
     $('#timer_span').css('color',self_color)
     $('h1').css('color',self_color)
+    $('#timer_container').show()
     $('#loading').hide()
-    $('body').css('background-color','#fff')
   }
 
   //Start a Conecction with a webSocket and catch callbacks to redirect to own functions
   function startConnection() {
     websocket= new WebSocket(wsUri)
     websocket.onopen = function(evt) {
-        
+    	console.log('Web socket on Open');
+        sendSpecifications();
     };
     websocket.onmessage = function(evt) {
         onMessage(evt);
@@ -179,14 +247,24 @@
   
   function onMessage(evt) {
 	json = JSON.parse(evt.data);
+	console.log("onMessage " + evt.data)
     action = json.action
     if(action=="paintedSpot"){
-      paintSpot(json.x,json.y,json.color)
+      paintSpot(json.x,json.y,json.userId)
     }else if(action=="startGame"){
-      setColor(json.color)
-      startGame(json.time,json.matrixSize,json.userId)
+   	  $('#pre_game_container').hide();
+      startGame()
     }else if(action=='timeIsOver'){
       endGame()
+    }else if(action=="specifications"){
+    	boardSize=json.matrixSize;
+    	user_id=json.userId;
+    	time=json.time;
+    	
+    }else if(action=="opponentEnterRoom"){
+    	$('#waiting_player').hide();
+    	$('#opponent_point_div').css('background','#bbbbbb')
+    	opponent_id=json.userId;
     }
   }
   function onError(evt) {
@@ -213,8 +291,18 @@
   }, false);
 
 
+  
+  function sendSpecifications(){
+	  message={'action':'sendSpecifications'}
+	  console.log(message)
+	  doSend(message);
+  }
+  
+  function sendStartGame(){
+	  message={'action':'startGame'}
+	  doSend(message);
+  }
 
- 
    var pointHTML = '<div class="point"><div></div></div>'
    var board=$('#board')
    var boardSize = 5;
@@ -239,25 +327,25 @@
    }
 				
    // Change point background
-   function paintSpot(x,y,color){
+   function paintSpot(x,y,id){
 	   
 	 var point = $($('#board')[0].rows[y].cells[x]).children().children()  
-     point.css('background-color',colors[color]);
-     if(colors[color] == self_color){
-    	  if(point.data('color')==opponent_color){
+     point.css('background-color',user_color[id]);
+     if(user_id == id){
+    	  if(point.data('user_id')==opponent_id){
     		  dataController.selfPainted(true)
-    	  }else if(point.data('color') != self_color){
+    	  }else if(point.data('user_id') != id){
     		  dataController.selfPainted(false)
     	  }
-    	  point.data('color',self_color)
+    	  point.data('user_id',user_id)
     	  
      }else{
-    		if(point.data('color')==self_color){
+    		if(point.data('user_id')==user_id){
    		  		dataController.opponentPainted(true)
-   	  		}else if(point.data('color') != opponent_color){
+   	  		}else if(point.data('user_id') != opponent_id){
    		  		dataController.opponentPainted(false)
    	  		}
-    	  point.data('color',opponent_color)
+    	  point.data('user_id',opponent_id)
      }
    
    }
@@ -267,7 +355,7 @@
      point = $(this);
      if(can_play){
        cell = $(point.parents('td')[0]);
-       paintSpot(cell.data('x'),cell.data('y'),self_color);
+       paintSpot(cell.data('x'),cell.data('y'),user_id);
        sendPoint(cell.data('x'),cell.data('y'));
      }else{
        $('#board').hide()
@@ -418,9 +506,39 @@
 		$('#flot-placeholder').show()
 		
 	}
+	
+	$('.color_selector').css('background-color',function(){
+		return $(this).data('colorHex')
+	})
+	$('.color_selector').css('width',windows_width/7);
+	$('.color_selector').css('height',windows_width/7);
+	$('.pre_game_point').css('width',windows_width/7)
+	$('.pre_game_point').css('height',windows_width/7)
+	
+	$('.color_selector').on('tap',function(){
+		color=$(this).data('colorHex')
+		$('#self_color_select > div').css('background-color',color)
+		self_color=color;
+		user_color[user_id]=color;
+		$('#color_select_container').children('div').each(function(){
+			$(this).removeClass('selected');
+			
+		});
+		$(this).addClass('selected')
+	});
+	
+	$('#ready_to_play').click(function(){
+		if(self_color!=null){
+			sendStartGame();	
+		}else{
+			alert('Select a Color!')
+		}
 		
-		
-	 
-
+	});
+	
+	
+	
+	
+	
 	
 </script>
