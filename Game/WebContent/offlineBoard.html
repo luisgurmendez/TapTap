@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title id="title">Demo</title>
+</head>
+<body>
+  <h1 align="center">Demo</h1>
+  <hr class="styled"> 
+  <div  id="timer_container">
+    <span id="timer_span">00:<span id="timer">0</span> s</span>
+  </div>
+  
+  <table style="margin:0 auto;" id="board">
+  </table>
+  
+ 
+
+ 
+
+</body>
+</html>
+<style>
+
+
+*{
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+  #opponent_color_select{float: left;}
+  
+  #opponent_point_div{
+	  background:url(ajax-loader.gif) no-repeat center center;
+	  background-size: cover;
+  }
+  
+  #pre_game_point_container{display: inline-flex;}
+  
+  #ready_to_play{
+  
+  }
+  
+  .color_selector{
+  	width: 50px;
+  	height: 50px;
+  	float: left;
+  	margin: 2px;
+  	border-radius: 20%;
+  
+  }
+  
+  
+  .selected{
+  	border: solid 5px blue;
+  }
+  
+  
+  
+  #color_select_container{
+  	display:inline-block;
+  	margin-top: 50px;	
+  }
+  .pre_game_point{padding-bottom: 100px;}
+
+  #flot-placeholder, #self_color_select,#color_select_container{
+  	margin: 0 auto;
+  }
+  
+  #loading{
+    background-color: #fff;
+  	box-shadow: 10px 10px 5px grey;
+  }
+
+  div{
+    text-align: center;
+  }
+
+  #timer_span,#timer{
+    font-size: 50px;
+  }
+
+  hr.styled{
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+  }
+
+  h1{
+    font-size: 70px;
+    color: #8190ff;
+    margin:0 auto;
+  }
+
+  .point{
+    height: 90px;
+    width: 90px;
+    border-style: solid;
+    border-width: 0px;
+    border-color: transparent;
+  }
+
+  .point > div{
+    background: #bbbbbb;
+    height: 95%;
+    width: 95%;
+    border-radius: 50%;
+  }
+
+  @media screen and (max-width: 480px) {
+    .point{
+      height: 70px;
+      width: 70px;
+    }
+
+    h1{
+      font-size: 40px;
+    }
+
+    span{
+      font-size: 20px;
+    }
+  }
+
+
+</style>
+
+<script src="scripts/plugins/jquery-2.2.2.js"></script>
+<script src="scripts/plugins/jquery.mobile-1.4.5.js"></script>
+<script src="scripts/ai.js"></script>
+<script>
+
+var user_id = 0;
+var ai_id = 1;
+var can_play=true
+var windows_height;
+var windows_width;
+var can_zoom =false;
+var boardSize;
+var time;
+
+var pointHTML = '<div class="point"><div></div></div>'
+var board=$('#board')
+var boardSize = 5;
+
+user_color = {};
+
+user_color[user_id] = "#1968ff";
+user_color[ai_id] = "#fb5041";
+	   
+	   
+ // Populate table with point DOMs
+ function generateBoard(size){
+
+   var tableHTML=""
+
+   for (i=0; i<size; i++ ){
+     tableHTML +="<tr>"
+     for (j=0; j<size;j++){
+       tableHTML +="<td data-x='" + j + "' data-y='" + i + "'>" + pointHTML + "</td>"
+     }
+     tableHTML +="</tr>"
+   }
+   board.append(tableHTML)
+ }
+ 
+ //To prevent zooming and moving around in touch devices 
+ window.addEventListener('touchmove', function(e) {
+   // we're not interested in this
+   // but prevent default behaviour
+   // so the screen doesn't scroll
+   // or zoom
+   if(!can_zoom){
+   	e.preventDefault();	
+   }
+   console.log("touchmove")
+   console.log(e)
+ }, false);
+ 
+ 
+ //Tap listener, call when user clicks or taps a point.
+ board.on('tap','.point',function(){
+   point = $(this);
+   if(can_play){
+     cell = $(point.parents('td')[0]);
+     paintCircle(cell.data('x'),cell.data('y'),user_id);
+   }
+ });
+ 
+ // Logic to determining winner
+ function determineWinner(){
+	mine = 0;
+	his = 0;
+   $('#board tr').each(function(){
+     $('td').each(function(){
+       point=$(this).children().children()
+       if(point.data('user_id') == user_id){
+        mine+=1 
+       }else if(point.data('user_id')== ai_id){
+         his+=1
+       }
+     })
+   }); 
+   
+   if(mine > his) {
+    	alert("You won!");
+   }else if(mine < his){
+    	alert("You lost!");	
+   }else{
+    	alert("Draw");
+   }
+ }
+ 
+ //Called whenever the game ends (timer off, otherplayer disconnects, etc)
+ function endGame(){
+   can_play=false
+   can_zoom=true;
+   determineWinner()
+ }
+ 
+
+ //Starts a timer thread
+ //BUG --> Finish timer when time=0
+ function timer(time){
+   var counter = time;
+
+   setInterval(function() {
+     counter--;
+     if (counter >= 0) {
+       $('#timer').text(counter);
+     }
+     if (counter === 0) {
+       endGame();
+       clearInterval();
+     }
+
+   }, 1000);
+
+ }
+ 
+ // Disable double tap-zoom
+ (function($) {
+   var count = 0;
+   $.fn.nodoubletapzoom = function() {
+     $(this).bind('touchstart', function preventZoom(e){
+       var t2 = e.timeStamp;
+       var t1 = $(this).data('lastTouch') || t2;
+       var dt = t2 - t1;
+       var fingers = e.originalEvent.touches.length;
+       $(this).data('lastTouch', t2);
+       if (!dt || dt > 500 || fingers > 1){
+         return; // not double-tap
+       }
+       if(!can_zoom){
+       	e.preventDefault();	
+       }
+        // double tap - prevent the zoom
+       // also synthesize click events we just swallowed up
+       $(e.target).trigger('tap');
+     });
+   };
+ })(jQuery);
+
+ $(document).on('pageinit',"body", function() {
+   $("body").nodoubletapzoom();
+ });
+ 
+var windows_width = $( window ).width();
+var windows_height = $( window ).height();
+
+// Re size point, for diferent screen sizes
+function reSizePoints(board_size){
+
+  windows_height-= windows_height*0.15;
+  windows_width-= windows_width*0.15;
+  max_width_size = windows_width/board_size;
+  max_height_size = windows_height/board_size;
+  min_size= (max_height_size > max_width_size) ? max_width_size : max_height_size;
+  $('.point').css('width',"" + min_size+ "px")
+  $('.point').css('height',"" + min_size + "px")
+
+}	
+
+generateBoard(boardSize);
+reSizePoints(boardSize);
+timer(20);
+startAi();
+
+ 
+  </script>
+  
