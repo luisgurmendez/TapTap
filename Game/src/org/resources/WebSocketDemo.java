@@ -159,7 +159,7 @@ public class WebSocketDemo {
 					String json = "{\"action\":\"specifications\", \"time\":"
 							+ newGame.getTime() + ", \"matrixSize\":"
 							+ newGame.getMatrix().length + ", \"userId\":" + id
-							+ "}";
+							+ ", \"challenge\":\"square\"}";
 					userSession.getBasicRemote().sendText(json);
 					break;
 				} catch (IOException e) {

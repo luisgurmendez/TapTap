@@ -9,6 +9,7 @@
     <title id="title">Demo</title>
 </head>
 <body>
+ <div id="testy" style="margin: 0 auto;"></div>
   <h1 align="center">Demo</h1>
   <hr class="styled"> 
   <div  id="timer_container" hidden>
@@ -24,7 +25,7 @@
 	  	<div id="opponent_point_div">
 	  		
 	  	</div>
-	  	<span id="waiting_player">Waiting for other player...</span>
+	  	<span id="waiting_player">Searching for other player...</span>
 	  </div>
 	</div>
 	  <div id="color_select_container">
@@ -66,6 +67,7 @@
   #pre_game_point_container{display: inline-flex;}
   
   #ready_to_play{
+  	font-size: 30px;
   
   }
   
@@ -155,12 +157,14 @@
 <script src="scripts/plugins/jquery-2.2.2.js"></script>
 <script src="scripts/plugins/jquery.mobile-1.4.5.js"></script>
 <script language="javascript" type="text/javascript" src="scripts/plugins/flot/jquery.flot.js"></script>
+<script src="scripts/plugins/jquery.toastee.0.1.js"></script>
 <script src="scripts/plugins/flot/curvedLines.js"></script>
 <script src="scripts/data_controller.js"></script>
+<script src="scripts/challenges.js"></script>
 <script>
 
 
-  var wsUri = "ws://192.168.1.45:8080/Game/gameWS";
+  var wsUri = "ws://10.252.254.2:8080/Game/gameWS";
   
   var websocket;
   var user_id;
@@ -176,21 +180,17 @@
   var boardSize;
   var time;
   var colors=['#fb5041',"#1968ff","#86F296","#F9FB89","#FF6DE3"]
-  var user_color={}
+  var user_color={};
+  var challenge;
   
   
   //Set nicer colors that server sends
   function setOpponentColor(color){
-   
 	  opponent_color = color;
 	  while(opponent_color == color){
 		  opponent_color=colors[Math.floor(Math.random() * colors.length)];
-		  user_color[opponent_id]=opponent_color;
-		  
+		  user_color[opponent_id]=opponent_color;  
 	  }
-	  
-	  
-	  
   }
 
   // Populate table with point DOMs
@@ -260,6 +260,7 @@
     	boardSize=json.matrixSize;
     	user_id=json.userId;
     	time=json.time;
+    	challenge = json.challenge;
     	
     }else if(action=="opponentEnterRoom"){
     	$('#waiting_player').hide();
@@ -357,6 +358,12 @@
        cell = $(point.parents('td')[0]);
        paintSpot(cell.data('x'),cell.data('y'),user_id);
        sendPoint(cell.data('x'),cell.data('y'));
+       if(checkChallenge(challenge)){
+    	   $('#testy').toastee({
+				type: 'success',
+				message: 'Challenge Sent!',
+			});
+       }
      }else{
        $('#board').hide()
      }
@@ -400,6 +407,8 @@
   // Sends game over data thorugh webSocket
   function sendGameOver(){
     message={'action':'timeIsOver'};
+    
+ 
     doSend(message);
   }
 
