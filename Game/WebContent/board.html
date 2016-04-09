@@ -5,6 +5,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles/toastr.css">
 
     <title id="title">Demo</title>
 </head>
@@ -157,7 +158,7 @@
 <script src="scripts/plugins/jquery-2.2.2.js"></script>
 <script src="scripts/plugins/jquery.mobile-1.4.5.js"></script>
 <script language="javascript" type="text/javascript" src="scripts/plugins/flot/jquery.flot.js"></script>
-<script src="scripts/plugins/jquery.toastee.0.1.js"></script>
+<script src="scripts/plugins/toastr.js"></script>
 <script src="scripts/plugins/flot/curvedLines.js"></script>
 <script src="scripts/data_controller.js"></script>
 <script src="scripts/challenges.js"></script>
@@ -182,6 +183,7 @@
   var colors=['#fb5041',"#1968ff","#86F296","#F9FB89","#FF6DE3"]
   var user_color={};
   var challenge;
+  var challenge_completed=false;
   
   
   //Set nicer colors that server sends
@@ -350,6 +352,23 @@
      }
    
    }
+   
+   
+   var toast=function(msg){
+		$("<div class='ui-loader ui-overlay-shadow ui-body-e ui-corner-all'><h3>"+msg+"</h3></div>")
+		.css({ display: "block", 
+			opacity: 0.90, 
+			position: "fixed",
+			padding: "7px",
+			"text-align": "center",
+			width: "270px",
+			left: ($(window).width() - 284)/2,
+			top: $(window).height()/2 })
+		.appendTo( $('body') ).delay( 1500 )
+		.fadeOut( 400, function(){
+			$(this).remove();
+		});
+	}
 
    //Tap listener, call when user clicks or taps a point.
    board.on('tap','.point',function(){
@@ -358,12 +377,14 @@
        cell = $(point.parents('td')[0]);
        paintSpot(cell.data('x'),cell.data('y'),user_id);
        sendPoint(cell.data('x'),cell.data('y'));
-       if(checkChallenge(challenge)){
-    	   $('#testy').toastee({
-				type: 'success',
-				message: 'Challenge Sent!',
-			});
+       if(!challenge_completed){
+    	   if(checkChallenge(challenge)){
+        	   toastr['success']("Challenge Completed!!")
+        	   challenge_completed=true;
+        	   
+           }  
        }
+       
      }else{
        $('#board').hide()
      }
@@ -545,9 +566,22 @@
 		
 	});
 	
-	
-	
-	
-	
+	toastr.options = {
+			  "closeButton": false,
+			  "debug": false,
+			  "newestOnTop": false,
+			  "progressBar": false,
+			  "positionClass": "toast-top-left",
+			  "preventDuplicates": false,
+			  "onclick": null,
+			  "showDuration": "300",
+			  "hideDuration": "1000",
+			  "timeOut": "5000",
+			  "extendedTimeOut": "1000",
+			  "showEasing": "swing",
+			  "hideEasing": "linear",
+			  "showMethod": "fadeIn",
+			  "hideMethod": "fadeOut"
+			}
 	
 </script>
