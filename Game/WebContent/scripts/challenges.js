@@ -36,7 +36,7 @@ function checkChallenge(challenge){
 						return completed;
 					}
 				}else{
-					if(x+y==boardSize){
+					if(x+y==boardSize-1){
 						if(point.data('user_id') != user_id){
 							completed=false;
 							return completed;
