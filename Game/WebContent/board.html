@@ -5,16 +5,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles/toastr.css">
 
     <title id="title">Demo</title>
 </head>
 <body>
+ <div id="testy" style="margin: 0 auto;"></div>
   <h1 align="center">Demo</h1>
-  <hr class="styled"> 
+  <hr class="styled">
   <div  id="timer_container" hidden>
     <span id="timer_span">00:<span id="timer">0</span> s</span>
   </div>
-  
+
   <div id="pre_game_container">
   	<div id="pre_game_point_container">
 	  <div id="self_color_select" class="point pre_game_point">
@@ -22,9 +24,9 @@
 	  </div>
 	  <div id="opponent_color_select" class="point pre_game_point">
 	  	<div id="opponent_point_div">
-	  		
+
 	  	</div>
-	  	<span id="waiting_player">Waiting for other player...</span>
+	  	<span id="waiting_player">Searching for other player...</span>
 	  </div>
 	</div>
 	  <div id="color_select_container">
@@ -34,92 +36,84 @@
 	  	<div class="color_selector"  data-color="yellow" data-color-hex="#F9FB89"></div>
 	  	<div class="color_selector"  data-color="violet" data-color-hex="#FF6DE3"></div>
 	  </div>
-	  
-	  
+
+	  <br>
 	  <button id="ready_to_play">Start!</button>
-	  
+
   </div>
   <table style="margin:0 auto;" id="board">
   </table>
-  
+
   <div id="flot-placeholder"  hidden></div>
 
- 
+
 
 </body>
 </html>
 
 <style>
-
-
 *{
     -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
-
   #opponent_color_select{float: left;}
-  
+
   #opponent_point_div{
 	  background:url(ajax-loader.gif) no-repeat center center;
 	  background-size: cover;
   }
-  
+
   #pre_game_point_container{display: inline-flex;}
-  
+
   #ready_to_play{
-  
+  	font-size: 30px;
+
   }
-  
+
   .color_selector{
   	width: 50px;
   	height: 50px;
   	float: left;
   	margin: 2px;
   	border-radius: 20%;
-  
+
   }
-  
-  
+
+
   .selected{
   	border: solid 5px blue;
   }
-  
-  
-  
+
+
+
   #color_select_container{
   	display:inline-block;
-  	margin-top: 50px;	
+  	margin-top: 50px;
   }
   .pre_game_point{padding-bottom: 100px;}
-
   #flot-placeholder, #self_color_select,#color_select_container{
   	margin: 0 auto;
   }
-  
+
   #loading{
     background-color: #fff;
   	box-shadow: 10px 10px 5px grey;
   }
-
   div{
     text-align: center;
   }
-
   #timer_span,#timer{
     font-size: 50px;
   }
-
   hr.styled{
     border: 0;
     height: 1px;
     background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
   }
-
   h1{
     font-size: 70px;
     color: #8190ff;
     margin:0 auto;
   }
-
   .point{
     height: 90px;
     width: 90px;
@@ -127,40 +121,34 @@
     border-width: 0px;
     border-color: transparent;
   }
-
   .point > div{
     background: #bbbbbb;
     height: 95%;
     width: 95%;
     border-radius: 50%;
   }
-
   @media screen and (max-width: 480px) {
     .point{
       height: 70px;
       width: 70px;
     }
-
     h1{
       font-size: 40px;
     }
-
     span{
       font-size: 20px;
     }
   }
-
-
 </style>
 <script src="scripts/plugins/jquery-2.2.2.js"></script>
 <script src="scripts/plugins/jquery.mobile-1.4.5.js"></script>
 <script language="javascript" type="text/javascript" src="scripts/plugins/flot/jquery.flot.js"></script>
+<script src="scripts/plugins/toastr.js"></script>
 <script src="scripts/plugins/flot/curvedLines.js"></script>
 <script src="scripts/data_controller.js"></script>
+<script src="scripts/challenges.js"></script>
 <script>
-
-
-  var wsUri = "ws://192.168.1.101:8080/Game/gameWS";
+ var wsUri = "ws://192.168.1.101:8080/Game/gameWS";
   
   var websocket;
   var user_id;
@@ -176,28 +164,22 @@
   var boardSize;
   var time;
   var colors=['#fb5041',"#1968ff","#86F296","#F9FB89","#FF6DE3"]
-  var user_color={}
-  
-  
+  var user_color={};
+  var challenge;
+  var challenge_completed=false;
+
+
   //Set nicer colors that server sends
   function setOpponentColor(color){
-   
 	  opponent_color = color;
 	  while(opponent_color == color){
 		  opponent_color=colors[Math.floor(Math.random() * colors.length)];
 		  user_color[opponent_id]=opponent_color;
-		  
 	  }
-	  
-	  
-	  
   }
-
   // Populate table with point DOMs
   function generateBoard(size){
-
     var tableHTML=""
-
     for (i=0; i<size; i++ ){
       tableHTML +="<tr>"
       for (j=0; j<size;j++){
@@ -207,7 +189,7 @@
     }
     board.append(tableHTML)
   }
-  
+
   //Called to generateBoard and set timer, and other details.
   function startGame(){
     generateBoard(boardSize)
@@ -220,7 +202,6 @@
     $('#timer_container').show()
     $('#loading').hide()
   }
-
   //Start a Conecction with a webSocket and catch callbacks to redirect to own functions
   function startConnection() {
     websocket= new WebSocket(wsUri)
@@ -239,12 +220,11 @@
     	endGame();
     };
   }
-
   startConnection();
-  
-  
+
+
   // Custome callbacks from websocket listners.
-  
+
   function onMessage(evt) {
 	json = JSON.parse(evt.data);
 	console.log("onMessage " + evt.data)
@@ -260,7 +240,8 @@
     	boardSize=json.matrixSize;
     	user_id=json.userId;
     	time=json.time;
-    	
+    	challenge = json.challenge;
+
     }else if(action=="opponentEnterRoom"){
     	$('#waiting_player').hide();
     	$('#opponent_point_div').css('background','#bbbbbb')
@@ -275,39 +256,32 @@
     //websocket.close();
   }
 
-
-  
-  //To prevent zooming and moving around in touch devices 
+  //To prevent zooming and moving around in touch devices
   window.addEventListener('touchmove', function(e) {
     // we're not interested in this
     // but prevent default behaviour
     // so the screen doesn't scroll
     // or zoom
     if(!can_zoom){
-    	e.preventDefault();	
+    	e.preventDefault();
     }
     console.log("touchmove")
     console.log(e)
   }, false);
 
-
-  
   function sendSpecifications(){
 	  message={'action':'sendSpecifications'}
 	  console.log(message)
 	  doSend(message);
   }
-  
+
   function sendStartGame(){
 	  message={'action':'startGame'}
 	  doSend(message);
   }
-
    var pointHTML = '<div class="point"><div></div></div>'
    var board=$('#board')
    var boardSize = 5;
-
-
    //Called whenever the game ends (timer off, otherplayer disconnects, etc)
    function endGame(){
      can_play=false
@@ -319,17 +293,17 @@
          scrollTop: $("#flot-placeholder").offset().top
      }, 2000);
    }
-   
+
    //Send painted point data through websocket
    function sendPoint(x,y){
      message={'action':"paintSpot",'x':x,'y':y,'userId':user_id}
      doSend(message)
    }
-				
+
    // Change point background
    function paintSpot(x,y,id){
-	   
-	 var point = $($('#board')[0].rows[y].cells[x]).children().children()  
+
+	 var point = $($('#board')[0].rows[y].cells[x]).children().children()
      point.css('background-color',user_color[id]);
      if(user_id == id){
     	  if(point.data('user_id')==opponent_id){
@@ -338,7 +312,7 @@
     		  dataController.selfPainted(false)
     	  }
     	  point.data('user_id',user_id)
-    	  
+
      }else{
     		if(point.data('user_id')==user_id){
    		  		dataController.opponentPainted(true)
@@ -347,9 +321,25 @@
    	  		}
     	  point.data('user_id',opponent_id)
      }
-   
+
    }
 
+
+   var toast=function(msg){
+		$("<div class='ui-loader ui-overlay-shadow ui-body-e ui-corner-all'><h3>"+msg+"</h3></div>")
+		.css({ display: "block",
+			opacity: 0.90,
+			position: "fixed",
+			padding: "7px",
+			"text-align": "center",
+			width: "270px",
+			left: ($(window).width() - 284)/2,
+			top: $(window).height()/2 })
+		.appendTo( $('body') ).delay( 1500 )
+		.fadeOut( 400, function(){
+			$(this).remove();
+		});
+	}
    //Tap listener, call when user clicks or taps a point.
    board.on('tap','.point',function(){
      point = $(this);
@@ -357,57 +347,64 @@
        cell = $(point.parents('td')[0]);
        paintSpot(cell.data('x'),cell.data('y'),user_id);
        sendPoint(cell.data('x'),cell.data('y'));
+       if(!challenge_completed){
+    	   if(checkChallenge(challenge)){
+        	   toastr['success']("Challenge Completed!!")
+        	   challenge_completed=true;
+
+           }
+       }
+
      }else{
        $('#board').hide()
      }
    });
-   
-   
+
+
    // Logic to determining winner
    function determineWinner(){
 	   mine=dataController.my_point_count
 	   his=dataController.opponent_point_count
-	   
+
 	  /*  $('#board tr').each(function(){
 	     $('td').each(function(){
 	       point=$(this).children().children()
 	       if(point.data('color')== self_color){
-	        mine+=1 
+	        mine+=1
 	       }else if(point.data('color')== opponent_color){
 	         his+=1
 	       }
 	     })
 	   }); */
-	   
+
 	   if(mine > his) {
 		   if(!alerted){
 	    		alert("You won!");
 	    		alerted=true
-	    	 } 	
+	    	 }
 	   }else if(mine < his){
 		   if(!alerted){
 	    		alert("You lost!");
 	    		alerted=true
-	    	 } 	
+	    	 }
 	   }else{
 		   if(!alerted){
 	    		alert("Draw");
 	    		alerted=true
-	    	 } 
+	    	 }
 	   }
 	 }
-
   // Sends game over data thorugh webSocket
   function sendGameOver(){
     message={'action':'timeIsOver'};
+
+
     doSend(message);
   }
-
   //Starts a timer thread
   //BUG --> Finish timer when time=0
   function timer(time){
     var counter = time;
-
     setInterval(function() {
       counter--;
       if (counter >= 0) {
@@ -418,11 +415,8 @@
         endGame();
         clearInterval();
       }
-
     }, 1000);
-
   }
-
   // Disable double tap-zoom
   (function($) {
     var count = 0;
@@ -437,7 +431,7 @@
           return; // not double-tap
         }
         if(!can_zoom){
-        	e.preventDefault();	
+        	e.preventDefault();
         }
          // double tap - prevent the zoom
         // also synthesize click events we just swallowed up
@@ -445,21 +439,17 @@
       });
     };
   })(jQuery);
-
   $(document).on('pageinit',"body", function() {
     $("body").nodoubletapzoom();
   });
-
 	window.onbeforeunload = function(e){
 		websocket.close();
 	}
-	
+
 	var windows_width = $( window ).width();
 	var windows_height = $( window ).height();
-
 	// Re size point, for diferent screen sizes
 	function reSizePoints(board_size){
-
 	  windows_height-= windows_height*0.15;
 	  windows_width-= windows_width*0.15;
 	  max_width_size = windows_width/board_size;
@@ -467,10 +457,9 @@
 	  min_size= (max_height_size > max_width_size) ? max_width_size : max_height_size;
 	  $('.point').css('width',"" + min_size+ "px")
 	  $('.point').css('height',"" + min_size + "px")
+	}
 
-	}	
-		
-	
+
 	function drawPlot(){
 		min_size= (windows_width > windows_height) ? windows_height : windows_width;
 		$('#flot-placeholder').css('width',min_size);
@@ -487,7 +476,7 @@
                          monotonicFit: true
                 }
             }
-		    }); 
+		    });
 		my_data=dataController.my_timeline_count;
 		opponent_data=dataController.opponent_timeline_count
 		data=  [{
@@ -504,9 +493,9 @@
 		plot.setupGrid()
 		plot.draw()
 		$('#flot-placeholder').show()
-		
+
 	}
-	
+
 	$('.color_selector').css('background-color',function(){
 		return $(this).data('colorHex')
 	})
@@ -514,7 +503,7 @@
 	$('.color_selector').css('height',windows_width/7);
 	$('.pre_game_point').css('width',windows_width/7)
 	$('.pre_game_point').css('height',windows_width/7)
-	
+
 	$('.color_selector').on('tap',function(){
 		color=$(this).data('colorHex')
 		$('#self_color_select > div').css('background-color',color)
@@ -522,23 +511,36 @@
 		user_color[user_id]=color;
 		$('#color_select_container').children('div').each(function(){
 			$(this).removeClass('selected');
-			
+
 		});
 		$(this).addClass('selected')
 	});
-	
+
 	$('#ready_to_play').click(function(){
 		if(self_color!=null){
-			sendStartGame();	
+			sendStartGame();
 		}else{
 			alert('Select a Color!')
 		}
-		
+
 	});
-	
-	
-	
-	
-	
-	
+
+	toastr.options = {
+			  "closeButton": false,
+			  "debug": false,
+			  "newestOnTop": false,
+			  "progressBar": false,
+			  "positionClass": "toast-top-left",
+			  "preventDuplicates": false,
+			  "onclick": null,
+			  "showDuration": "300",
+			  "hideDuration": "1000",
+			  "timeOut": "5000",
+			  "extendedTimeOut": "1000",
+			  "showEasing": "swing",
+			  "hideEasing": "linear",
+			  "showMethod": "fadeIn",
+			  "hideMethod": "fadeOut"
+			}
+
 </script>
