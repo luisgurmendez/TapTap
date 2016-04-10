@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title id="title">TapTap</title>
+</head>
+<body>
+  <img src="image.png" alt="TapTap"  align="middle">
+
+  
+  <div id="playRandom" align="center">
+  	<a href="http://localhost:8080/Game/board.html" class="button">Match me with a Random</a>
+  </div>
+
+  
+  <div id="playFriend" align="center">
+	<a href="#" class="button">Play with a friend!</a>
+  </div>
+
+  
+  <div id="offline" align="center">
+  	<a href="http://localhost:8080/Game/offlineBoard.html" class="button">Play Offline</a>
+  </div>
+
+  <div id="copyright" align="center">2016 Creado por Luis Gurméndez, Lucía Etchecopar, Nicolás Ferro y Santiago Mancini</div>
+
+</body>
+
+<style>
+
+img {
+    display: block;
+    margin: 0 auto;
+}
+
+#copyright {
+    position: fixed;     
+    text-align: center;    
+    bottom: 25px; 
+    width: 100%;
+}
+.playRandom {
+	text-align: center;
+}
+.playFriend {
+	text-align: center;
+}
+.offline {
+	text-align: center;
+}
+.button {
+    background-color: #4CAF50;
+    width: 30%;
+    border: none;
+    color: white;
+    align: center;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 40px;
+    margin: 20px 2px;
+    cursor: pointer;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    border-radius: 8px;
+    top: 50%;
+    left: 50%;
+    
+}
+
+  @media screen and (max-width: 480px) {
+    .button{
+      height: 70px;
+      width: 70px;
+    }
+
+    img{
+      font-size: 40px;
+    }
+
+    span{
+      font-size: 20px;
+    }
+  }
+</style>
+
+</html>
