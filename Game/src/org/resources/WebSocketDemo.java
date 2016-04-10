@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import javax.websocket.OnClose;
@@ -15,6 +16,7 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import org.controllers.ChallengeController;
 import org.json.JSONObject;
 import org.models.Game;
 
@@ -26,7 +28,9 @@ public class WebSocketDemo {
 	private static Map<Session, Game> sessionGame = new HashMap<Session, Game>();
 	private static List<Game> games = new ArrayList<Game>();
 	private static int counter = 0;
-
+	private static ChallengeController challengeController = new ChallengeController();
+	private static Random r = new Random();
+	
 	@OnOpen
 	public void openConnection(Session userSession) {
 		allSessions.add(userSession);
@@ -159,7 +163,7 @@ public class WebSocketDemo {
 					String json = "{\"action\":\"specifications\", \"time\":"
 							+ newGame.getTime() + ", \"matrixSize\":"
 							+ newGame.getMatrix().length + ", \"userId\":" + id
-							+ ", \"challenge\":\"square\"}";
+							+ ", \"challenge\":\"" + challengeController.getRandomChallenge().getChallenge()  + "\"}";
 					userSession.getBasicRemote().sendText(json);
 					break;
 				} catch (IOException e) {
