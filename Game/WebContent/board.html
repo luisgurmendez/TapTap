@@ -12,11 +12,11 @@
 <body>
  <div id="testy" style="margin: 0 auto;"></div>
   <h1 align="center">Demo</h1>
-  <hr class="styled"> 
+  <hr class="styled">
   <div  id="timer_container" hidden>
     <span id="timer_span">00:<span id="timer">0</span> s</span>
   </div>
-  
+
   <div id="pre_game_container">
   	<div id="pre_game_point_container">
 	  <div id="self_color_select" class="point pre_game_point">
@@ -24,7 +24,7 @@
 	  </div>
 	  <div id="opponent_color_select" class="point pre_game_point">
 	  	<div id="opponent_point_div">
-	  		
+
 	  	</div>
 	  	<span id="waiting_player">Searching for other player...</span>
 	  </div>
@@ -36,17 +36,17 @@
 	  	<div class="color_selector"  data-color="yellow" data-color-hex="#F9FB89"></div>
 	  	<div class="color_selector"  data-color="violet" data-color-hex="#FF6DE3"></div>
 	  </div>
-	  
-	  
+
+
 	  <button id="ready_to_play">Start!</button>
-	  
+
   </div>
   <table style="margin:0 auto;" id="board">
   </table>
-  
+
   <div id="flot-placeholder"  hidden></div>
 
- 
+
 
 </body>
 </html>
@@ -59,45 +59,49 @@
 }
 
   #opponent_color_select{float: left;}
-  
+
   #opponent_point_div{
 	  background:url(ajax-loader.gif) no-repeat center center;
 	  background-size: cover;
   }
-  
+
   #pre_game_point_container{display: inline-flex;}
-  
+
   #ready_to_play{
+<<<<<<< Updated upstream
   	font-size: 30px;
   
+=======
+
+>>>>>>> Stashed changes
   }
-  
+
   .color_selector{
   	width: 50px;
   	height: 50px;
   	float: left;
   	margin: 2px;
   	border-radius: 20%;
-  
+
   }
-  
-  
+
+
   .selected{
   	border: solid 5px blue;
   }
-  
-  
-  
+
+
+
   #color_select_container{
   	display:inline-block;
-  	margin-top: 50px;	
+  	margin-top: 50px;
   }
   .pre_game_point{padding-bottom: 100px;}
 
   #flot-placeholder, #self_color_select,#color_select_container{
   	margin: 0 auto;
   }
-  
+
   #loading{
     background-color: #fff;
   	box-shadow: 10px 10px 5px grey;
@@ -165,8 +169,13 @@
 <script>
 
 
+<<<<<<< Updated upstream
   var wsUri = "ws://10.252.254.2:8080/Game/gameWS";
   
+=======
+  var wsUri = "ws://192.168.56.1:8080/Game/gameWS";
+
+>>>>>>> Stashed changes
   var websocket;
   var user_id;
   var opponent_id;
@@ -181,6 +190,7 @@
   var boardSize;
   var time;
   var colors=['#fb5041',"#1968ff","#86F296","#F9FB89","#FF6DE3"]
+<<<<<<< Updated upstream
   var user_color={};
   var challenge;
   var challenge_completed=false;
@@ -193,6 +203,23 @@
 		  opponent_color=colors[Math.floor(Math.random() * colors.length)];
 		  user_color[opponent_id]=opponent_color;  
 	  }
+=======
+  var user_color={}
+
+
+  //Set nicer colors that server sends
+  function setOpponentColor(color){
+
+	  opponent_color = color;
+	  while(opponent_color == color){
+		  opponent_color=colors[Math.floor(Math.random() * colors.length)];
+		  user_color[opponent_id]=opponent_color;
+
+	  }
+
+
+
+>>>>>>> Stashed changes
   }
 
   // Populate table with point DOMs
@@ -209,7 +236,7 @@
     }
     board.append(tableHTML)
   }
-  
+
   //Called to generateBoard and set timer, and other details.
   function startGame(){
     generateBoard(boardSize)
@@ -243,10 +270,10 @@
   }
 
   startConnection();
-  
-  
+
+
   // Custome callbacks from websocket listners.
-  
+
   function onMessage(evt) {
 	json = JSON.parse(evt.data);
 	console.log("onMessage " + evt.data)
@@ -262,8 +289,12 @@
     	boardSize=json.matrixSize;
     	user_id=json.userId;
     	time=json.time;
+<<<<<<< Updated upstream
     	challenge = json.challenge;
     	
+=======
+
+>>>>>>> Stashed changes
     }else if(action=="opponentEnterRoom"){
     	$('#waiting_player').hide();
     	$('#opponent_point_div').css('background','#bbbbbb')
@@ -279,28 +310,28 @@
   }
 
 
-  
-  //To prevent zooming and moving around in touch devices 
+
+  //To prevent zooming and moving around in touch devices
   window.addEventListener('touchmove', function(e) {
     // we're not interested in this
     // but prevent default behaviour
     // so the screen doesn't scroll
     // or zoom
     if(!can_zoom){
-    	e.preventDefault();	
+    	e.preventDefault();
     }
     console.log("touchmove")
     console.log(e)
   }, false);
 
 
-  
+
   function sendSpecifications(){
 	  message={'action':'sendSpecifications'}
 	  console.log(message)
 	  doSend(message);
   }
-  
+
   function sendStartGame(){
 	  message={'action':'startGame'}
 	  doSend(message);
@@ -322,17 +353,17 @@
          scrollTop: $("#flot-placeholder").offset().top
      }, 2000);
    }
-   
+
    //Send painted point data through websocket
    function sendPoint(x,y){
      message={'action':"paintSpot",'x':x,'y':y,'userId':user_id}
      doSend(message)
    }
-				
+
    // Change point background
    function paintSpot(x,y,id){
-	   
-	 var point = $($('#board')[0].rows[y].cells[x]).children().children()  
+
+	 var point = $($('#board')[0].rows[y].cells[x]).children().children()
      point.css('background-color',user_color[id]);
      if(user_id == id){
     	  if(point.data('user_id')==opponent_id){
@@ -341,7 +372,7 @@
     		  dataController.selfPainted(false)
     	  }
     	  point.data('user_id',user_id)
-    	  
+
      }else{
     		if(point.data('user_id')==user_id){
    		  		dataController.opponentPainted(true)
@@ -350,7 +381,7 @@
    	  		}
     	  point.data('user_id',opponent_id)
      }
-   
+
    }
    
    
@@ -389,39 +420,39 @@
        $('#board').hide()
      }
    });
-   
-   
+
+
    // Logic to determining winner
    function determineWinner(){
 	   mine=dataController.my_point_count
 	   his=dataController.opponent_point_count
-	   
+
 	  /*  $('#board tr').each(function(){
 	     $('td').each(function(){
 	       point=$(this).children().children()
 	       if(point.data('color')== self_color){
-	        mine+=1 
+	        mine+=1
 	       }else if(point.data('color')== opponent_color){
 	         his+=1
 	       }
 	     })
 	   }); */
-	   
+
 	   if(mine > his) {
 		   if(!alerted){
 	    		alert("You won!");
 	    		alerted=true
-	    	 } 	
+	    	 }
 	   }else if(mine < his){
 		   if(!alerted){
 	    		alert("You lost!");
 	    		alerted=true
-	    	 } 	
+	    	 }
 	   }else{
 		   if(!alerted){
 	    		alert("Draw");
 	    		alerted=true
-	    	 } 
+	    	 }
 	   }
 	 }
 
@@ -467,7 +498,7 @@
           return; // not double-tap
         }
         if(!can_zoom){
-        	e.preventDefault();	
+        	e.preventDefault();
         }
          // double tap - prevent the zoom
         // also synthesize click events we just swallowed up
@@ -483,7 +514,7 @@
 	window.onbeforeunload = function(e){
 		websocket.close();
 	}
-	
+
 	var windows_width = $( window ).width();
 	var windows_height = $( window ).height();
 
@@ -498,9 +529,9 @@
 	  $('.point').css('width',"" + min_size+ "px")
 	  $('.point').css('height',"" + min_size + "px")
 
-	}	
-		
-	
+	}
+
+
 	function drawPlot(){
 		min_size= (windows_width > windows_height) ? windows_height : windows_width;
 		$('#flot-placeholder').css('width',min_size);
@@ -517,7 +548,7 @@
                          monotonicFit: true
                 }
             }
-		    }); 
+		    });
 		my_data=dataController.my_timeline_count;
 		opponent_data=dataController.opponent_timeline_count
 		data=  [{
@@ -534,9 +565,9 @@
 		plot.setupGrid()
 		plot.draw()
 		$('#flot-placeholder').show()
-		
+
 	}
-	
+
 	$('.color_selector').css('background-color',function(){
 		return $(this).data('colorHex')
 	})
@@ -544,7 +575,7 @@
 	$('.color_selector').css('height',windows_width/7);
 	$('.pre_game_point').css('width',windows_width/7)
 	$('.pre_game_point').css('height',windows_width/7)
-	
+
 	$('.color_selector').on('tap',function(){
 		color=$(this).data('colorHex')
 		$('#self_color_select > div').css('background-color',color)
@@ -552,19 +583,20 @@
 		user_color[user_id]=color;
 		$('#color_select_container').children('div').each(function(){
 			$(this).removeClass('selected');
-			
+
 		});
 		$(this).addClass('selected')
 	});
-	
+
 	$('#ready_to_play').click(function(){
 		if(self_color!=null){
-			sendStartGame();	
+			sendStartGame();
 		}else{
 			alert('Select a Color!')
 		}
-		
+
 	});
+<<<<<<< Updated upstream
 	
 	toastr.options = {
 			  "closeButton": false,
@@ -584,4 +616,12 @@
 			  "hideMethod": "fadeOut"
 			}
 	
+=======
+
+
+
+
+
+
+>>>>>>> Stashed changes
 </script>
