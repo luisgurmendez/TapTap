@@ -26,33 +26,21 @@ public class WebSocketDemo {
 	private static Set<Session> allSessions = Collections
 			.synchronizedSet(new HashSet<Session>());
 	private static Map<Session, Game> sessionGame = new HashMap<Session, Game>();
+	private static Map<String,Game> invitationGame = new HashMap<String,Game>(); 
 	private static List<Game> games = new ArrayList<Game>();
 	private static int counter = 0;
+	private static int time=30;
+	private static int boardSize=5;
 	private static ChallengeController challengeController = new ChallengeController();
 	private static Random r = new Random();
 	
 	@OnOpen
 	public void openConnection(Session userSession) {
 		allSessions.add(userSession);
-		Game newGame = availableGame();
-		if (newGame != null) {
-			newGame.setWaiting(false);
-			newGame.getSessions()[1] = userSession;
-			newGame.getListOfUsers()[1] = counter;
-			counter++;
-			sessionGame.put(userSession, newGame);
-			sendArrivals(newGame);
-		} else {
-			int[] array = new int[2];
-			array[0] = counter;
-			newGame = new Game(30, new String[5][5], array, userSession);
-			games.add(newGame);
-			counter++;
-			sessionGame.put(userSession, newGame);
-		}
+		
 	}
 
-	private Game availableGame() {
+	private Game getAvailableGame() {
 		Game returnGame = null;
 		for (Game game : games) {
 			if (game.isWaiting() == true) {
@@ -63,6 +51,53 @@ public class WebSocketDemo {
 		return returnGame;
 	}
 
+	
+	
+	private Game getInvitationGame(Session session,String gameId){
+		Game rGame = invitationGame.get(gameId);
+		if(rGame == null){
+			int[] array = new int[2];
+			array[0] = counter;
+			rGame = new Game(time, new String[boardSize][boardSize], array, session);
+			counter++;
+			sessionGame.put(session, rGame);
+		}else{
+			rGame.setWaiting(false);
+			rGame.getSessions()[1] = session;
+			rGame.getListOfUsers()[1] = counter;
+			counter++;
+			sessionGame.put(session, rGame);
+			sendArrivals(rGame);
+			
+		}
+		return rGame;
+	}
+	
+	
+	private void joinOrCreateGame(Session session,String gameId){
+		
+		if(gameId!=null){ 
+			Game game=getInvitationGame(session, gameId);
+			invitationGame.put(gameId, game);
+		}else{
+			Game newGame = getAvailableGame();
+			if (newGame != null) {
+				newGame.setWaiting(false);
+				newGame.getSessions()[1] = session;
+				newGame.getListOfUsers()[1] = counter;
+				counter++;
+				sessionGame.put(session, newGame);
+				sendArrivals(newGame);
+			} else {
+				int[] array = new int[2];
+				array[0] = counter;
+				newGame = new Game(time, new String[boardSize][boardSize], array, session);
+				games.add(newGame);
+				counter++;
+				sessionGame.put(session, newGame);
+			}		
+		}
+	}
 	@OnMessage
 	public void gotAMessage(Session session, String msg) {
 		if (msg != null) {
@@ -70,7 +105,13 @@ public class WebSocketDemo {
 			System.out.println(json.toString());
 			String action = json.getString("action");
 			String textToSend = null;
-			if (action.equals("sendSpecifications")) {
+			if (action.equals("join")) {
+				
+				if(!json.isNull("gameId")){
+					joinOrCreateGame(session,json.getString("gameId"));
+				}else{
+					joinOrCreateGame(session,null);
+				}
 				sendSpecifications(session);
 			} else if (action.equals("startGame")) {
 				Game thisGame = findGame(session);
