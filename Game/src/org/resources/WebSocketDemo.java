@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 import javax.websocket.OnClose;
@@ -32,7 +31,7 @@ public class WebSocketDemo {
 	private static int time=30;
 	private static int boardSize=5;
 	private static ChallengeController challengeController = new ChallengeController();
-	private static Random r = new Random();
+//	private static Random r = new Random();
 	
 	@OnOpen
 	public void openConnection(Session userSession) {

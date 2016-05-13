@@ -1,10 +1,10 @@
 package org.models;
 
-public class Challenge {
+public class ChallengeLuis {
 	
 	private String challenge;
 	
-	public Challenge(String challenge){
+	public ChallengeLuis(String challenge){
 		this.challenge = challenge;
 	}
 	
