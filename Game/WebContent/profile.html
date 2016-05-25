@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title id="title">TapTap</title>
+</head>
+
+<body>
+	<div id="trophy_img" align="center">
+  		<img src="trophy-clipart-free-trophy_golden.png" alt="Trophy"  align="middle">
+  	</div>
+  	
+  	<div id="user_container" align="center">
+
+  	</div>
+  	
+  	 <div id="challenges" align="center">
+		<a href="#" class="button">Challenges</a>
+	 </div>
+	 
+  	 <div id="statistics" align="center">
+		<a href="#" class="button">Statistics</a>
+	 </div>
+	 
+  	 <div id="inferior_buttons">
+		<a href="#" class="button1" id="logout">Logout</a>
+		<a href="#" class="button1" id="menu">Menu</a>
+	 </div>
+	 
+</body>
+
+<style>
+
+img {
+
+	max-width: 100%;
+	height: 8%;
+	width: 8%;
+}
+
+#inferior_buttons > #logout{
+    margin-top: 100px;
+    margin-left:100px;
+}
+
+#inferior_buttons > #menu{
+	float: right;
+    margin-top: 100px;
+    margin-right:100px;
+}
+
+
+.challenges {
+	text-align: center;
+}
+
+.statistics{
+	text-align: center;
+}
+
+#user_name {
+
+	color: #4CAF50;
+	font-size: 30px;
+}
+
+#user_score {
+	font-size: 40px;
+}
+.button {
+    background-color: #4CAF50;
+    width: 20%;
+    border: none;
+    color: white;
+    align: center;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 40px;
+    margin: 20px 2px;
+    cursor: pointer;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    border-radius: 8px;
+    top: 50%;
+    left: 50%;
+    
+}
+
+
+.button1 {
+    background-color: #4CAF50;
+    width: 5%;
+    border: none;
+    color: white;
+    padding: 20px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 25px;
+    cursor: pointer;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    border-radius: 8px;
+    top: 50%;
+    left: 50%;
+    
+}
+
+
+
+
+ @media screen and (max-width: 480px) {
+   .button{
+     height: 70px;
+     width: 70px;
+   }
+   .button1{
+     height: 20px;
+     width: 20px;
+   }
+
+   img{
+     font-size: 40px;
+   }
+
+   span{
+     font-size: 20px;
+   }
+ }
+</style>
+
+<script>
+	var userTest = {"username":"santiago", "userscore":"34356"};
+	
+	//Esta función recibe un diccionario.
+	
+	function makeProfile(user) {
+		
+		html = '';
+		userdata = user;
+		
+		html += '<div id="user_name" align="center">'
+				+ userdata.username
+				+ '</div>'
+				+ ' '
+				+ '<div id="user_score" align="center">'
+				+ 'score: ' + userdata.userscore
+				+ '</div>'
+				+ ' '
+				
+		return html;
+	}
+	
+	// Esta función toma un html y lo inserta en el documento en el "hijo" deseado (o div).
+	
+	function insertHTML(id, html) {
+	    var el = document.getElementById(id);
+	    
+	    if(!el) {
+	        alert('Element with id ' + id + ' not found.');
+	    }
+	    
+	    el.innerHTML = html;
+	}
+
+	// Esta función será la que ejecute todo.
+	
+	function run() {
+	    var profileHtml = makeProfile(userTest);
+	    
+	    insertHTML('user_container', profileHtml);
+	}
+
+	// Corre todo cuando carga el documento.
+	window.onload = run;
+	
+	
+</script>
+</html>

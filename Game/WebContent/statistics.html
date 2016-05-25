@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title id="title">TapTap</title>
+</head>
+
+<script type="text/javascript">
+var gamesPlayed = 10;
+var gamesWon = 8;
+var gamesLost = (gamesPlayed - gamesWon);
+
+window.onload = function () {
+	
+    CanvasJS.addColorSet("taptapTheme",
+            [//colorSet Array
+
+             "#4CAF50",
+             "grey"
+            ]);
+    
+	var chart = new CanvasJS.Chart("chartContainer",
+	{
+		colorSet: "taptapTheme",
+		title:{
+			text: "Games Played"
+		},
+		legend: {
+			maxWidth: 350,
+			itemWidth: 120
+		},
+		data: [
+		{
+			type: "pie",
+			showInLegend: true,
+			legendText: "{indexLabel}",
+			dataPoints: [
+				{ y: gamesWon, indexLabel: "Won" },
+				{ y: gamesLost, indexLabel: "Lost" },
+			]
+		}
+		]
+	});
+	chart.render();
+}
+</script>
+
+<script type="text/javascript" src="scripts/canvasjs.min.js"></script>
+
+<body>
+
+	 <div id="statistics_title" align="center">
+		Statistics	
+	 </div>
+ 
+	<div id="chartContainer" align="center">
+	
+	</div>
+
+</body>
+
+<style>
+
+#statistics_title {
+	color: #4CAF50;
+	font-size: 70px;
+	margin-bottom: 5%;
+}
+
+#chartContainer {
+	width: 100%;
+	height: 90%;
+}
+
+</style>
