@@ -2,87 +2,96 @@
 
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
+<title>TapTap</title>
 
-    <title id="title">TapTap</title>
-</head>
-<body>
-  <img src="image.png" alt="TapTap"  align="middle">
+<!-- Avoids browser's cache -->
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+<META HTTP-EQUIV="Expires" CONTENT="-1">
 
-  
-  <div id="playRandom" align="center">
-  	<a href="http://localhost:8080/Game/board.html" class="button">Match me with a Random</a>
-  </div>
+<!-- jQuery -->
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 
-  
-  <div id="playFriend" align="center">
-	<a href="#" class="button">Play with a friend!</a>
-  </div>
+<!-- Material design lite -->
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet"
+	href="https://code.getmdl.io/1.1.3/material.indigo-pink.min.css">
+<script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script>
 
-  
-  <div id="offline" align="center">
-  	<a href="http://localhost:8080/Game/offlineBoard.html" class="button">Play Offline</a>
-  </div>
-
-  <div id="copyright" align="center">2016 Creado por Luis Gurméndez, Lucía Etchecopar, Nicolás Ferro y Santiago Mancini</div>
-
-</body>
+<!-- Another material design -->
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
+	
+<!-- Icon -->
+<link rel="stylesheet" href="styles/font-awesome-4.6.3/font-awesome-4.6.3/css/font-awesome.min.css">
 
 <style>
-
-img {
-    display: block;
-    margin: 0 auto;
+#playRandom, #playFriend, #offline, #logOutButton {
+	background-color: #4CAF50;
+	font-size: large;
+	width: 28%;
+	color: white;
+	font-family: "Roboto", "Helvetica", "Arial", sans-serif;
 }
-
-#copyright {    
-    text-align: center;    
-    bottom: 25px; 
-    width: 100%;
-}
-.playRandom {
-	text-align: center;
-}
-.playFriend {
-	text-align: center;
-}
-.offline {
-	text-align: center;
-}
-.button {
-    background-color: #4CAF50;
-    width: 30%;
-    border: none;
-    color: white;
-    align: center;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 40px;
-    margin: 20px 2px;
-    cursor: pointer;
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
-    border-radius: 8px;
-    top: 50%;
-    left: 50%;
-    
-}
-
-  @media screen and (max-width: 480px) {
-    .button{
-      height: 70px;
-      width: 70px;
-    }
-
-    img{
-      font-size: 40px;
-    }
-
-    span{
-      font-size: 20px;
-    }
-  }
 </style>
 
+<script>
+	$(document).ready(
+			function() {
+				$("#includedContent").load("logoutTemplate.html"); 
+				var address = "http://localhost:8080/Game/rest/users/delete";
+				$("#logOutButton").click(function(event) {
+					event.preventDefault();
+					$.ajax({
+						type : 'POST',
+						url : address,
+						success : function() {
+							window.location.href = "/Game/loginPage.html";
+						},
+						error : function() {
+							alert('An error has occurred!');
+						}
+					});
+				});
+			});
+</script>
+
+</head>
+<body>
+	<div id="includedContent"></div>
+	<!-- <div align="center">
+		<img src="image.png" alt="TapTap" align="middle" />
+	</div>
+	<div>
+		<button id="logOutButton" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+		style="width:10%; float:right; margin-right:25%">Logout <i class="fa fa-sign-out" aria-hidden="true"></i></button>
+	</div>
+	<br />
+	<br />
+	<br /> -->
+	<div align="center">
+		<a id="playRandom"
+			class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+			href="http://localhost:8080/Game/board.html" class="button">
+			<i class="fa fa-male" aria-hidden="true"></i> Match me at random</a>
+	</div>
+	<br />
+	<div align="center">
+		<a id="playFriend"
+			class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+			href="invite.html" class="button">Play with a friend</a>
+	</div>
+	<br />
+	<div align="center">
+		<a id="offline"
+			class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+			href="http://localhost:8080/Game/offlineBoard.html" class="button">Play
+			offline</a>
+	</div>
+
+</body>
 </html>

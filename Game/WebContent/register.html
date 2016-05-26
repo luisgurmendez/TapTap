@@ -5,6 +5,12 @@
 <title>Register</title>
 <link rel="stylesheet" type="text/css" href="styles/stylesheet.css" />
 
+<!-- Avoids browser's cache -->
+<meta http-equiv=”Expires” content=”0″>
+<meta http-equiv=”Last-Modified” content=”0″>
+<meta http-equiv=”Cache-Control” content=”no-cache, mustrevalidate”>
+<meta http-equiv=”Pragma” content=”no-cache”>
+
 <!-- jQuery -->
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
@@ -108,10 +114,10 @@
 							}
 						});
 				$("#cancelButton").click(function() {
-					window.location.href = "login.html";
+					window.location.href = "loginPage.html";
 				});
 				$("#backButton").click(function() {
-					window.location.href = "login.html";
+					window.location.href = "loginPage.html";
 				});
 				$(document).ajaxStart(function() {
 					$("#loadingGif").css("display", "block");
