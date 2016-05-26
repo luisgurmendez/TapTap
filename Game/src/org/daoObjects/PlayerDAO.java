@@ -25,6 +25,8 @@ public class PlayerDAO {
 	private String username;
 	private String password;
 	private long points;
+	private long matchesPlayed;
+	private long matchesWon;
 	@ManyToMany
 	@JoinTable(name = "players_challenges")
 	@Cascade(CascadeType.DELETE)
@@ -65,6 +67,22 @@ public class PlayerDAO {
 
 	public void setPoints(long points) {
 		this.points = points;
+	}
+
+	public long getMatchesPlayed() {
+		return matchesPlayed;
+	}
+
+	public void setMatchesPlayed(long matchesPlayed) {
+		this.matchesPlayed = matchesPlayed;
+	}
+
+	public long getMatchesWon() {
+		return matchesWon;
+	}
+
+	public void setMatchesWon(long matchesWon) {
+		this.matchesWon = matchesWon;
 	}
 
 	public List<ChallengeDAO> getDoneChallenges() {

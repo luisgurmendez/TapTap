@@ -69,6 +69,7 @@ public class UserService {
 			player = new Player(playerFound.getUsername(), playerFound.getPassword());
 			player.setPoints(playerFound.getPoints());
 		}
+		player.setPassword("");
 		return player;
 	}
 	

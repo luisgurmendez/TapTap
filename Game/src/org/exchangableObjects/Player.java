@@ -8,6 +8,8 @@ public class Player {
 	private String username;
 	private String password;
 	private long points;
+	private long matchesPlayed;
+	private long matchesWon;
 	
 	public Player(){}
 	
@@ -15,6 +17,8 @@ public class Player {
 		this.username = username;
 		this.password = password;
 		points = (long)0;
+		matchesPlayed = (long)0;
+		matchesWon = (long)0;
 	}
 
 	public String getUsername() {
@@ -41,6 +45,22 @@ public class Player {
 		this.points = points;
 	}
 	
+	public long getMatchesPlayed() {
+		return matchesPlayed;
+	}
+
+	public void setMatchesPlayed(long matchesPlayed) {
+		this.matchesPlayed = matchesPlayed;
+	}
+
+	public long getMatchesWon() {
+		return matchesWon;
+	}
+
+	public void setMatchesWon(long matchesWon) {
+		this.matchesWon = matchesWon;
+	}
+
 	@Override
 	public boolean equals(Object other){
 		boolean areTheyEqual = false;

@@ -36,7 +36,6 @@ public class WebSocketDemo {
 	@OnOpen
 	public void openConnection(Session userSession) {
 		allSessions.add(userSession);
-		
 	}
 
 	private Game getAvailableGame() {
@@ -50,8 +49,6 @@ public class WebSocketDemo {
 		return returnGame;
 	}
 
-	
-	
 	private Game getInvitationGame(Session session,String gameId){
 		Game rGame = invitationGame.get(gameId);
 		if(rGame == null){
@@ -97,6 +94,7 @@ public class WebSocketDemo {
 			}		
 		}
 	}
+	
 	@OnMessage
 	public void gotAMessage(Session session, String msg) {
 		if (msg != null) {
