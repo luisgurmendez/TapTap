@@ -148,7 +148,7 @@
 <script src="scripts/data_controller.js"></script>
 <script src="scripts/challenges.js"></script>
 <script>
- var wsUri = "ws://10.252.253.13:8080/Game/gameWS";
+ var wsUri = "ws://localhost:8080/Game/gameWS";
   
   var websocket;
   var user_id;
@@ -294,7 +294,7 @@
      can_zoom=true;
      determineWinner()
      websocket.close()
-     drawPlot();
+    //drawPlot();
      $('html body').animate({
          scrollTop: $("#flot-placeholder").offset().top
      }, 2000);
@@ -466,7 +466,7 @@
 	}
 
 
-	function drawPlot(){
+/*	function drawPlot(){
 		min_size= (windows_width > windows_height) ? windows_height : windows_width;
 		$('#flot-placeholder').css('width',min_size);
 		$('#flot-placeholder').css('height',min_size);
@@ -500,7 +500,7 @@
 		plot.draw()
 		$('#flot-placeholder').show()
 
-	}
+	} */
 
 	$('.color_selector').css('background-color',function(){
 		return $(this).data('colorHex')

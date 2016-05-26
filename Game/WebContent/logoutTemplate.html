@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+
+<style>
+#logOutButton {
+	background-color: #4CAF50;
+	font-size: large;
+	width: 28%;
+	color: white;
+	font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+}
+</style>
+
+<script>
+	$(document).ready(
+			function() {
+				var address = "http://localhost:8080/Game/rest/users/delete";
+				$("#logOutButton").click(function(event) {
+					event.preventDefault();
+					$.ajax({
+						type : 'POST',
+						url : address,
+						success : function() {
+							window.location.href = "/Game/loginPage.html";
+						},
+						error : function() {
+							alert('An error has occurred!');
+						}
+					});
+				});
+			});
+</script>
+</head>
+<body>
+
+	<div align="center">
+		<img src="image.png" alt="TapTap" align="middle" />
+	</div>
+	<div>
+		<button id="logOutButton" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+		style="width:10%; float:right; margin-right:25%">Logout <i class="fa fa-sign-out" aria-hidden="true"></i></button>
+	</div>
+	<br />
+	<br />
+	<br />
+
+</body>
+</html>

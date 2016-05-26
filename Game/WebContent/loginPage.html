@@ -5,9 +5,15 @@
 <title>Login</title>
 <link rel="stylesheet" type="text/css" href="styles/stylesheet.css" />
 
+<!-- Avoids browser's cache -->
+<meta http-equiv=”Expires” content=”0″>
+<meta http-equiv=”Last-Modified” content=”0″>
+<meta http-equiv=”Cache-Control” content=”no-cache, mustrevalidate”>
+<meta http-equiv=”Pragma” content=”no-cache”>
+
 <!-- jQuery -->
 <script
-	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+	src="scripts/plugins/jquery-2.2.2.js"></script>
 
 <!-- Material design lite -->
 <link rel="stylesheet"
@@ -28,6 +34,7 @@
 	font-size: medium;
 	width: 10%;
 	color: white;
+	font-family:"Roboto","Helvetica","Arial",sans-serif;
 }
 
 .input-field input[type=text], .input-field input[type=password] {
@@ -135,7 +142,7 @@
 		</div>
 		<br>
 		<div>
-			<img id="loadingGif" src="loading.gif" alt="TapTap" align="middle" />
+			<img id="loadingGif" src="loading.gif" align="middle" />
 		</div>
 	</div>
 </html>
