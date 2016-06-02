@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="UTF-8">
+<title>Invite a friend</title>
+<link rel="stylesheet" type="text/css" href="styles/stylesheet.css" />
+
+<!-- Avoids browser's cache -->
+<meta http-equiv=”Expires” content=”0″>
+<meta http-equiv=”Last-Modified” content=”0″>
+<meta http-equiv=”Cache-Control” content=”no-cache, mustrevalidate”>
+<meta http-equiv=”Pragma” content=”no-cache”>
+
+<!-- jQuery -->
+<script
+	src="scripts/plugins/jquery-2.2.2.js"></script>
+
+<!-- Material design lite -->
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet"
+	href="https://code.getmdl.io/1.1.3/material.indigo-pink.min.css">
+<script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script>
+
+<!-- Another material design -->
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
+
+<style>
+#startButton, #cancelButton {
+	background-color: #4CAF50;
+	font-size: medium;
+	width: 10%;
+	color: white;
+	font-family:"Roboto","Helvetica","Arial",sans-serif;
+}
+
+.input-field input[type=text] {
+	width: 20%;
+	align: center;
+	margin: none;
+}
+
+.input-field input[type=text]:focus, .input-field input[type=password]:focus {
+	border-bottom: 1px solid #4CAF50;
+	box-shadow: 0 1px 0 0 #000;
+}
+
+.errorMessage {
+	font-size: large;
+	width: 20%;
+	color: red;
+	font-family: monospace;
+	font-weight: bold;
+	display: none;
+}
+
+#inviteAFriendHeader {
+	font-family: 'Raleway',sans-serif; 
+	color: #4CAF50;
+	font-size: 30px; 
+	font-weight: 800; 
+	line-height: 72px; 
+	margin: 0 0 24px; 
+	text-align: center; 
+	text-transform: uppercase
+}
+
+#loadingGif {
+	display: none;
+}
+</style>
+
+<script>
+	$(document).ready(function() {
+		$("#includedContent").load("logoutTemplate.html");
+		$("#startButton").click(function(event) {
+			event.preventDefault();
+			$(".errorMessage").css("display", "none");
+			var identifier = $("#identifier").val();
+			if (identifier.length == 0) {
+				$("#missingidentifier").css("display", "block");
+			} else {
+				window.location.href = "board.html?game_id=" + identifier;
+			}
+		});
+		
+		$("#cancelButton").click(function() {
+			window.location.href = "loginPage.html";
+		});
+		
+		$(document).ajaxStart(function() {
+			$("#loadingGif").css("display", "block");
+		});
+		$(document).ajaxComplete(function() {
+			$("#loadingGif").css("display", "none");
+		});
+		
+	});
+</script>
+
+<!-- Avoids browser's cache -->
+<meta http-equiv=”Expires” content=”0″>
+<meta http-equiv=”Last-Modified” content=”0″>
+<meta http-equiv=”Cache-Control” content=”no-cache, mustrevalidate”>
+<meta http-equiv=”Pragma” content=”no-cache”>
+
+</head>
+<body>
+	<div id="includedContent"></div>
+	<!-- <img src="image.png" alt="TapTap" align="middle" />
+	<br />
+	<br /> -->
+	<div align="center">
+		<span id="inviteAFriendHeader">Invite a friend:</span>
+	</div>
+	<br />
+	<div align="center">
+		<span class="errorMessage" id="missingIdentifier">You must enter an identifier!</span> 
+		<span class="errorMessage" id="identifierTaken">The identifier is already taken, try another one!</span>
+	</div>
+	<div align="center" id="container">
+		<div class="input-field col s6">
+			<input placeholder="Select an identifier" id="identifier" type="text"
+				class="validate">
+		</div>
+		<br>
+		<div>
+			<button id="startButton"
+				class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+				Invite</button>
+			<button id="cancelButton"
+				class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+				Cancel</button>
+		</div>
+		<br>
+		<div>
+			<img id="loadingGif" src="loading.gif" align="middle" />
+		</div>
+	</div>
+</html>
