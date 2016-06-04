@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tap-Tap</title>
+    <meta name="viewport" content="minimal-ui, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="format-detection" content="telephone=no" />
+
+	<link rel="stylesheet" href="mobileui/mui.min.css" type="text/css">
+    <link rel="stylesheet" href="custom/custom.css" type="text/css">
+	<!--[if lt IE 9]><script  type="text/javascript" src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script><![endif]-->
+
+    <script src="phonegap.js"></script>
+	<script src="vendors/fastclick.min.js" type="text/javascript"></script>
+	<!-- <script type="text/javascript" src="PushNotification.js"></script>  -->
+    	
+    <script src="vendors/jquery.min.js" type="text/javascript"></script>
+    <script src="vendors/jquery.animate-enhanced.js" type="text/javascript"></script>
+	<script src="vendors/jqwait/jquery.wait.min.js" type="text/javascript"></script>   
+    <script src="vendors/iscroll-min.js" type="text/javascript"></script>
+    
+	<script src="mobileui/mui.min.js" type="text/javascript"></script>
+    <script src="custom/custom.js" type="text/javascript"></script>
+	<script src="vendors/plugins/jquery.mobile-1.4.5.js" type="text/javascript"></script>
+	<script src="http://192.168.1.46:8080/target/target-script-min.js#anonymous"></script>
+
+</head>
+<body>
+	<!-- Main wrapper. Importantly, think carefully before you change it or remove it. Do not recommend it. -->
+	<!-- Main wrapper. Importante, Piénselo bien antes de cambiarlo o quitarlo. No se lo recomiendo. -->
+    <div id="mui-screen" class="mui-viewport">
+		<div id="mui-screen-page" class="mui-page">
+			<!-- Ddefault viewport. Do not remove. It will make your life simpler and happy. -->
+			<!-- ViewPort por defecto. No lo elimines. Hará tu vida más simple y feliz. -->
+			<div id="mui-viewport" class="mui-viewport">
+				<!--MENU PAGE-->
+				<div id='menu-page' class="mui-page mui-scrollable">
+					<div class="mui-page-header">
+					</div>
+					<div class="mui-page-body" id="home-body">
+						<div id="home_img_container">
+							<img id="home_tap_tap_img" src="image.png" alt="TapTap"  align="middle">
+						</div>
+
+						<div id="play_random_home_btn" align="center">
+							<a href="javascript: mui.viewport.showPage('play_online_page','FADE');onlineController.startConnection();" class="home_button">Match Me at Random</a>
+						</div>
+
+
+						<div id="play_friend_home_btn" align="center">
+							<a href="javascript: mui.viewport.showPage('challenges_page','FADE');" class="home_button">Play with a Friend</a>
+						</div>
+
+
+						<div id="play_offline_home_btn" align="center">
+							<a href='javascript: mui.viewport.showPage("play_offline_page", "SLIDE_LEFT");offlineController.startOffline();' class="home_button">Play Offline</a>
+						</div>
+					</div>
+				</div>
+				<div id="challenges_page" class="mui-page">
+					<div id="challenges_title" align="center">
+						Challenges
+					</div>
+
+					<div id="challenges_container" class="mui-scrollable" align="center">
+						<div>
+
+
+						</div>
+					</div>
+				</div>
+				<!--OFFLINE PAGE-->
+				<div id='play_offline_page' class="mui-page">
+					<div>
+
+						<div id="offline_pause_layer" hidden></div>
+						<span id="offline_countdown_timer">0</span>
+
+						<div id="offline_body">
+							<div id="offline_time_counter_container">
+								<div>
+
+								</div>
+								<div  class="timer_container">
+									<span class="timer_span">:<span id="timer_offline">0</span></span>
+								</div>
+								<div>
+
+								</div>
+							</div>
+							<table style="margin:0 auto;" id="board_offline">
+							</table>
+
+
+							<div class="offline_surrend_btn" id="offline_btn">Surrend</div>
+
+						</div>
+					</div>
+				</div>
+
+				<!--ONLINE MULTIPLAYER PAGE-->
+				<div id="play_online_page" class="mui-page">
+					<div>
+						<div id="online_pause_layer" hidden>
+							<span id="online_countdown_timer">0</span>
+						</div>
+						<div  id="online_timer_container" class="timer_container" hidden>
+							<span class="timer_span">00:<span id="online_timer">0</span> s</span>
+						</div>
+						<div id="pre_game_container">
+							<div id="pre_game_point_container">
+								<div id="self_color_select" class="point pre_game_point">
+									<div>
+									</div>
+								</div>
+								<div id="opponent_color_select" class="point pre_game_point">
+									<div id="opponent_point_div">
+									</div>
+									<span id="status_message">Waiting for other player...</span>
+								</div>
+							</div>
+							<div id="color_select_container">
+								<div class="color_selector"  data-color="red" data-color-hex="#fb5041"></div>
+								<div class="color_selector"  data-color="blue" data-color-hex="#1968ff"></div>
+								<div class="color_selector"  data-color="green" data-color-hex="#86F296"></div>
+								<div class="color_selector"  data-color="yellow" data-color-hex="#F9FB89"></div>
+								<div class="color_selector"  data-color="violet" data-color-hex="#FF6DE3"></div>
+							</div>
+							<br>
+							<button class="home_button" id="ready_to_play">Start!</button>
+
+						</div>
+						<table style="margin:0 auto;" id="online_board">
+						</table>
+
+						<div class="online_back_btn" id="online_btn">Back</div>
+
+
+					</div>
+
+				</div>
+			</div>	
+		</div>	
+		<!-- mui-screen level panel -->
+		<!-- Panel a nivel de mui-screen -->
+
+    </div>
+</body>
+</html>
+
+<style>
+
+	#home_tap_tap_img{
+		width: 100%;
+	}
+
+	#home_img_container{
+		width: 95%;
+		margin: 0 auto;
+	}
+
+	#play_random_home_btn, #play_friend_home_btn, #play_offline_home_btn {
+		text-align: center;
+	}
+
+	#pre_game_container{
+		margin-top: 20px;
+	}
+
+	.home_button {
+		background-color: #4CAF50;
+		width: 80%;
+		border: none;
+		color: white;
+		align: center;
+		padding: 15px 25px;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		font-size: 20px;
+		margin: 20px 2px;
+		cursor: pointer;
+		box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+		border-radius: 8px;
+		top: 50%;
+		left: 50%;
+	}
+
+
+	.offline_surrend_btn,.online_surrend_btn{
+		background-color: #ff1a1a;
+	}
+	.offline_back_btn,.online_back_btn{
+		background-color: #4CAF50;
+	}
+	#offline_btn,#online_btn{
+		padding: 10px;
+		position:absolute;
+		bottom: 0;
+		color:white;
+		font-size: 20px;
+		float: left;
+		border-radius: 8px;
+		margin-left: 5px;
+		margin-bottom: 5px;
+
+	}
+	#offline_pause_layer,#online_pause_layer{
+		position: absolute; /* Stay in place */
+		z-index: 1; /* Sit on top */
+		width: 100%; /* Full width */
+		height: 100%; /* Full height */
+		background-color: rgba(0, 0, 0, 0.36); /* Black w/ opacity */
+	}
+
+	*{
+		-webkit-tap-highlight-color: rgba(0,0,0,0);
+	}
+
+	div{
+		text-align: center;
+	}
+
+	.timer_span,#timer_offline,#multiplayer_timer{
+		font-size: 50px;
+	}
+
+	#offline_countdown_timer,#online_countdown_timer{
+		position: absolute;
+		top:25%;
+		left: 0;
+		width: 100%;
+		text-align: center;
+		font-size: 150px;
+		color: #5ca2ff;
+		z-index: 2;
+
+	}
+
+	h1{
+		font-size: 70px;
+		color: #8190ff;
+		margin:0 auto;
+	}
+
+	.point{
+		height: 90px;
+		width: 90px;
+		border-style: solid;
+		border-width: 0px;
+		border-color: transparent;
+	}
+
+	.point > div{
+		background: #bbbbbb;
+		height: 95%;
+		width: 95%;
+		border-radius: 50%;
+	}
+
+	#opponent_color_select{float: left;}
+
+	#opponent_point_div{
+		background:url(ajax-loader.gif) no-repeat center center;
+		background-size: cover;
+	}
+
+	#pre_game_point_container{
+		display: inline-flex;
+		padding-bottom: 10%;
+	}
+
+	#ready_to_play{
+		font-size: 30px;
+
+	}
+
+	.color_selector{
+		width: 50px;
+		height: 50px;
+		float: left;
+		margin: 2px;
+		border-radius: 20%;
+
+	}
+	.selected{
+
+		transform: scale(1.1, 1.1);
+		opacity: 1;
+
+	}
+
+	#color_select_container{
+		display:inline-block;
+		margin-top: 50px;
+	}
+
+	#flot-placeholder, #self_color_select,#color_select_container{
+		margin: 0 auto;
+	}
+
+	#status_message{font-size: 12px}
+
+	#challenges_title {
+		color: #4CAF50;
+		font-size: 70px;
+	}
+
+	#challenges_container {
+		width: 90%;
+		overflow: auto;
+		margin: 0 auto;
+		height: 90%;
+	}
+
+	.challenge {
+
+		float: left;
+		width: 30%;
+		display: inline;
+		margin-left: 2.5%;
+		margin-bottom: 3%;
+		border-radius: 10%;
+	}
+
+	.challenge > .challenge_img {
+		width: 80%;
+		height: 80%;
+		max-height: 100%;
+		max-width: 100%;
+		border-radius: 10%;
+
+	}
+
+	.challenge > .challenge_data{
+		width: 80%;
+		height: 17.5%;
+		margin-top: 2.5%;
+		max-height: 15%;
+	}
+
+	.challenge > .challenge_data > .challenge_name {
+		width: 80%;
+		border-radius: 10%;
+		height: 58%;
+		font-size: 20px;
+		color: #4CAF50;
+
+	}
+
+	.challenge > .challenge_data > .challenge_score {
+		width: 80%;
+		height: 38%;
+		margin-top: 4%;
+		font-size: 25px;
+		color: grey;
+
+	}
+
+
+	.challenge_img > img {
+		max-height: 100%;
+		max-width: 100%;
+		border-radius: 10%;
+	}
+
+
+
+</style>
+
+<script src="ai.js" type="text/javascript"></script>
+<script src="offline_page.js" type="text/javascript"></script>
+<script src="online_page.js" type="text/javascript"></script>
+<script src="data_controller.js" type="text/javascript"></script>
+<script src="challenges.js" type="text/javascript"></script>
+<script src="challenges_page.js"></script>

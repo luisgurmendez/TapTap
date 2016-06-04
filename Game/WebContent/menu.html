@@ -43,7 +43,7 @@
 	$(document).ready(
 			function() {
 				$("#includedContent").load("logoutTemplate.html"); 
-				var address = "http://localhost:8080/Game/rest/users/delete";
+				var address = "http://taptap.ddns.net:8080/Game/rest/users/delete";
 				$("#logOutButton").click(function(event) {
 					event.preventDefault();
 					$.ajax({
@@ -76,7 +76,7 @@
 	<div align="center">
 		<a id="playRandom"
 			class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-			href="http://localhost:8080/Game/board.html" class="button">
+			href="http://taptap.ddns.net:8080/Game/board.html" class="button">
 			<i class="fa fa-male" aria-hidden="true"></i> Match me at random</a>
 	</div>
 	<br />
@@ -89,7 +89,7 @@
 	<div align="center">
 		<a id="offline"
 			class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-			href="http://localhost:8080/Game/offlineBoard.html" class="button">Play
+			href="http://taptap.ddns.net:8080/Game/offlineBoard.html" class="button">Play
 			offline</a>
 	</div>
 
