@@ -7,12 +7,10 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="styles/toastr.css">
 
-    <title id="title">Demo</title>
+    <title id="title">Tap tap</title>
 </head>
 <body>
  <div id="testy" style="margin: 0 auto;"></div>
-  <h1 align="center">Demo</h1>
-  <hr class="styled">
   <div  id="timer_container" hidden>
     <span id="timer_span">00:<span id="timer">0</span> s</span>
   </div>
@@ -21,6 +19,7 @@
   	<div id="pre_game_point_container">
 	  <div id="self_color_select" class="point pre_game_point">
 	  	<div></div>
+	  	<span id="self_username"></span>
 	  </div>
 	  <div id="opponent_color_select" class="point pre_game_point">
 	  	<div id="opponent_point_div">
@@ -167,8 +166,19 @@
   var user_color={};
   var challenge;
   var challenge_completed=false;
+  var username;
+  var opponent_username;
 
-
+  $.ajax({
+		type : 'GET',
+		async: false,
+		url : 'http://taptap.ddns.net:8080/Game/rest/users/userInformation',
+		success : function(player) {
+			username = player.username;
+			$("#self_username").text(username);
+		}
+	});
+  
   //Set nicer colors that server sends
   function setOpponentColor(color){
 	  opponent_color = color;
@@ -243,9 +253,10 @@
     	challenge = json.challenge;
 
     }else if(action=="opponentEnterRoom"){
-    	$('#waiting_player').hide();
     	$('#opponent_point_div').css('background','#bbbbbb')
     	opponent_id=json.userId;
+    	opponent_username = json.username;
+    	$('#waiting_player').text(opponent_username);
     }
   }
   function onError(evt) {
@@ -279,9 +290,9 @@
 	  doSend(message);
   }
   
-  
   function joinGame(game_id){
-	  message={'action':'join','gameId':game_id}
+	  message={'action':'join','gameId':game_id, 'username':username}
+	  console.log(message);
 	  doSend(message);
   }
   
