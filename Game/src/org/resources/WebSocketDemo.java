@@ -49,12 +49,12 @@ public class WebSocketDemo {
 		return returnGame;
 	}
 
-	private Game getInvitationGame(Session session,String gameId){
+	private Game getInvitationGame(Session session,String gameId, String username){
 		Game rGame = invitationGame.get(gameId);
 		if(rGame == null){
 			int[] array = new int[2];
 			array[0] = counter;
-			rGame = new Game(time, new String[boardSize][boardSize], array, session);
+			rGame = new Game(time, new String[boardSize][boardSize], array, session, username);
 			counter++;
 			sessionGame.put(session, rGame);
 		}else{
@@ -70,15 +70,16 @@ public class WebSocketDemo {
 	}
 	
 	
-	private void joinOrCreateGame(Session session,String gameId){
+	private void joinOrCreateGame(Session session,String gameId, String username){
 		
 		if(gameId!=null){ 
-			Game game=getInvitationGame(session, gameId);
+			Game game=getInvitationGame(session, gameId, username);
 			invitationGame.put(gameId, game);
 		}else{
 			Game newGame = getAvailableGame();
 			if (newGame != null) {
 				newGame.setWaiting(false);
+				newGame.getUsernames()[1] = username;
 				newGame.getSessions()[1] = session;
 				newGame.getListOfUsers()[1] = counter;
 				counter++;
@@ -87,7 +88,7 @@ public class WebSocketDemo {
 			} else {
 				int[] array = new int[2];
 				array[0] = counter;
-				newGame = new Game(time, new String[boardSize][boardSize], array, session);
+				newGame = new Game(time, new String[boardSize][boardSize], array, session, username);
 				games.add(newGame);
 				counter++;
 				sessionGame.put(session, newGame);
@@ -103,11 +104,11 @@ public class WebSocketDemo {
 			String action = json.getString("action");
 			String textToSend = null;
 			if (action.equals("join")) {
-				
+				String username = json.getString("username");
 				if(!json.isNull("gameId")){
-					joinOrCreateGame(session,json.getString("gameId"));
+					joinOrCreateGame(session,json.getString("gameId"), username);
 				}else{
-					joinOrCreateGame(session,null);
+					joinOrCreateGame(session,null, username);
 				}
 				sendSpecifications(session);
 			} else if (action.equals("startGame")) {
@@ -174,7 +175,8 @@ public class WebSocketDemo {
 		try {
 			for (int i = 0; i < game.getSessions().length; i++) {
 				json = "{\"action\":\"opponentEnterRoom\", \"userId\":"
-						+ game.getOtherUserId(game.getListOfUsers()[i]) + "}";
+						+ game.getOtherUserId(game.getListOfUsers()[i]) 
+						+ ", \"username\":\"" + game.getOpponentsUsername(game.getUsernames()[i]) + "\"}";
 				System.out.println(json);
 				game.getSessions()[i].getBasicRemote().sendText(json);
 			}
@@ -185,7 +187,7 @@ public class WebSocketDemo {
 		}
 
 	}
-
+	
 	private void sendSpecifications(Session userSession) {
 
 		Game newGame = findGame(userSession);

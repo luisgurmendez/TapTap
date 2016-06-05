@@ -12,8 +12,9 @@ public class Game {
 	private boolean[] readyToPlay;
 	private boolean running;
 	private Session gameOwner;
+	private String[] usernames;
 	
-	public Game(float time, String[][] matrix, int[] listOfUsers, Session session) {
+	public Game(float time, String[][] matrix, int[] listOfUsers, Session session, String username) {
 		super();
 		this.time = time;
 		this.matrix = matrix;
@@ -26,6 +27,8 @@ public class Game {
 		this.running=false;
 		this.waiting=true;
 		this.gameOwner = session;
+		this.usernames = new String[2];
+		this.usernames[0] = username;
 	}
 	
 	
@@ -72,6 +75,14 @@ public class Game {
 		return returnId;
 	}
 	
+	public String getOpponentsUsername(String username){
+		String result = usernames[0];
+		if (usernames[0].equals(username)){
+			result = usernames[1];
+		}
+		return result;
+	}
+	
 	public float getTime() {
 		return time;
 	}
@@ -115,6 +126,14 @@ public class Game {
 
 	public void setReadyToPlay(boolean[] readyToPlay) {
 		this.readyToPlay = readyToPlay;
+	}
+	
+	public String[] getUsernames() {
+		return usernames;
+	}
+	
+	public void setUsernames(String[] usernames) {
+		this.usernames = usernames;
 	}
 
 }
