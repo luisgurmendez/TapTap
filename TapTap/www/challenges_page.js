@@ -16,23 +16,26 @@ var challengesTotalNumber = 10;
 
 var challengesTest = [];
 
-$.ajax({
-    type : 'GET',
-    async : false,
-    url : 'http://taptap.ddns.net:8080/Game/rest/challenges/Nicolas',
-    success : function(challenges) {
-        challengesTest = challenges;
-        run()
-        $('.challenge .challenge_img').css('height',$($(".challenge > .challenge_img")[0]).height())
+function getChallenges(){
+    
+    $.ajax({
+        type : 'GET',
+        async : false,
+        dataType: 'json',
+        url : 'http://taptap.ddns.net:8080/Game/rest/challenges/byUsernameApp/Nicolas' ,
+        success : function(challenges) {
+            challengesTest = challenges;
+            run()
+            $('.challenge .challenge_img').css('height',$($(".challenge > .challenge_img")[0]).height())
+        },
+        error : function(jqXHR, textStatus, errorThrown) {
+            alert('An error has occurred!' + errorThrown + "+++" + JSON.stringify(jqXHR));
+            console.log(jqXHR,textStatus,errorThrown)
+        }
 
-    },
+    });
+}
 
-    error : function(jqXHR, textStatus, errorThrown) {
-        alert('An error has occurred!');
-        console.log(jqXHR,textStatus,errorThrown)
-    }
-
-});
 
 
 function makeChallenges (challenges){
@@ -116,7 +119,7 @@ function run() {
 //window.onload = run;
 
 $(window).on('resize', function(){
-    $('.cahllenge .challenge_img').css('height','80%');
+    $('.challenge .challenge_img').css('height','80%');
     //$('.challenge .challenge_img').css('height',$($(".challenge > .challenge_img")[0]).height())
 })
 

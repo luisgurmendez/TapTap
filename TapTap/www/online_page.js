@@ -17,7 +17,11 @@ onlineController={
     challenge_completed: false,
     id_timer: 0,
     id_countdown: 0,
+    room_id: null,
     paused: true,
+    username: mui.localStorage.get('user').username,
+    opponent_username: null,
+    dataController: new DataController(),
     generateBoard: function(){
         var tableHTML=""
         var pointHTML = '<div class="point_online point"><div></div></div>'
@@ -34,8 +38,8 @@ onlineController={
     },
     determineWinner: function(){
 
-        mine=dataController.my_point_count
-        his=dataController.opponent_point_count
+        mine=this.dataController.my_point_count
+        his=this.dataController.opponent_point_count
         if(mine > his) {
             if(!this.alerted){
                 alert("You won!");
@@ -71,8 +75,9 @@ onlineController={
         this.generateBoard();
         this.can_play=true
         this.timer(this.time);
-        this.reSizePoints(this.boardSize)
         this.colorController.setOpponentColor(this.colorController.self_color)
+        $('#online_timer_container').show()
+        this.reSizePoints(this.boardSize)
         $('#online_timer_span').css('color',this.colorController.self_color)
         $('#online_timer_container').show()
 
@@ -81,6 +86,7 @@ onlineController={
         this.can_play=false
         this.determineWinner()
         this.websocket.close()
+        this.colorController.self_color=null;
 
     },
     timer: function(time){
@@ -101,7 +107,13 @@ onlineController={
         this.websocket= new WebSocket(this.wsUri)
         this.websocket.onopen = function(evt) {
             //this.joinGame(getURLVariable("id"))
-            onlineController.joinGame(null);
+            if(onlineController.room_id != null){
+                onlineController.joinGame(onlineController.room_id)
+            }else{
+                onlineController.joinGame(null);
+
+            }
+            onlineController.room_id=null;
         };
         this.websocket.onmessage = function(evt) {
             onlineController.onMessage(evt);
@@ -112,6 +124,8 @@ onlineController={
         this.websocket.onclose = function(evt){
             alert("WS closed.")
         };
+        $("#self_username").text(this.username)
+        this.username=mui.localStorage.get('user').username
     },
     onMessage: function(evt) {
         json = JSON.parse(evt.data);
@@ -130,9 +144,11 @@ onlineController={
             this.challenge = json.challenge;
 
         } else if (action == "opponentEnterRoom") {
-            $('#status_message').hide();
             $('#opponent_point_div').css('background', '#bbbbbb')
             this.opponent_id = json.userId;
+            alert(JSON.stringify(json))
+            this.opponent_username = json.username;
+            $('#status_message').text(this.opponent_username);
         }
     },
     onError: function(){
@@ -155,7 +171,7 @@ onlineController={
         this.doSend(message);
     },
     joinGame: function(game_id){
-        message={'action':'join','gameId':game_id}
+        message={'action':'join','gameId':game_id, 'username':this.username}
         this.doSend(message);
     },
     sendPoint : function(x,y){
@@ -172,20 +188,23 @@ onlineController={
         point.css('background-color',this.colorController.user_color[id]);
         if(this.user_id == id){
             if(point.data('user_id')==this.opponent_id){
-                dataController.selfPainted(true)
+                this.dataController.selfPainted(true)
             }else if(point.data('user_id') != id){
-                dataController.selfPainted(false)
+                this.dataController.selfPainted(false)
             }
             point.data('user_id',this.user_id)
         }else{
             if(point.data('user_id')==this.user_id){
-                dataController.opponentPainted(true)
+                this.dataController.opponentPainted(true)
             }else if(point.data('user_id') != this.opponent_id){
-                dataController.opponentPainted(false)
+                this.dataController.opponentPainted(false)
             }
             point.data('user_id',this.opponent_id)
         }
 
+        $('#online_timer_container .point_count_self span').text(onlineController.dataController.my_point_count)
+        $('#online_timer_container .point_count_opponent span').text(onlineController.dataController.opponent_point_count)
+        
     },
     // Re size point, for diferent screen sizes
     reSizePoints: function(){
@@ -196,6 +215,15 @@ onlineController={
         min_size= (max_height_size > max_width_size) ? max_width_size : max_height_size;
         $('.point_online').css('width',"" + min_size+ "px")
         $('.point_online').css('height',"" + min_size + "px")
+
+        $('#online_timer_container .point_count_self').css('width', $('#online_timer_container').height())
+        $('#online_timer_container .point_count_self').css('height', $('#online_timer_container').height())
+        $('#online_timer_container .point_count_opponent').css('width', $('#online_timer_container').height())
+        $('#online_timer_container .point_count_opponent').css('height', $('#online_timer_container').height())
+        $('#online_timer_container .point_count_self').css('border','1px solid' + this.colorController.self_color)
+        $('#online_timer_container .point_count_opponent').css('border','1px solid' + this.colorController.opponent_color)
+        
+        
     },
     
     destroy: function(){
@@ -320,11 +348,11 @@ $('#online_btn').on('click',function(){
         }else{
             onlineController.destroy();
         }
-        mui.viewport.showPage("menu-page", "SLIDE_RIGHT")
+        mui.viewport.showPage("menu_page", "SLIDE_RIGHT")
         $(this).addClass('online_back_btn').removeClass('online_surrend_btn')
     }else{
         onlineController.destroy();
-        mui.viewport.showPage("menu-page", "SLIDE_RIGHT")
+        mui.viewport.showPage("menu_page", "SLIDE_RIGHT")
     }
 });
 

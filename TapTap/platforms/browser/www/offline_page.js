@@ -17,6 +17,7 @@ offlineController={
     paused: true,
     board: $('#board_offline'),
     user_color: {0:"#1968ff",1:"#fb5041"},
+    dataController: new DataController(),
 
     // Populate table with point DOMs
     generateBoard: function(size){
@@ -30,6 +31,13 @@ offlineController={
             tableHTML +="</tr>"
         }
         $('#board_offline').append(tableHTML);
+        $('#offline_time_counter_container .timer_container .point_count_self').css('width', $('#offline_time_counter_container .timer_container').height())
+        $('#offline_time_counter_container .timer_container .point_count_self').css('height', $('#offline_time_counter_container .timer_container').height())
+        $('#offline_time_counter_container .timer_container .point_count_opponent').css('width', $('#offline_time_counter_container .timer_container').height())
+        $('#offline_time_counter_container .timer_container .point_count_opponent').css('height', $('#offline_time_counter_container .timer_container').height())
+        $('#offline_time_counter_container .timer_container .point_count_self').css('border','1px solid' + this.user_color[this.user_id])
+        $('#offline_time_counter_container .timer_container .point_count_opponent').css('border','1px solid' + this.user_color[this.ai_id])
+
 
     },
     // Logic to determining winner
@@ -66,6 +74,8 @@ offlineController={
         $('#offline_btn').removeClass('offline_surrend_btn')
         $('#offline_btn').addClass('offline_back_btn')
         $('#offline_btn').text('Back')
+        this.dataController.reset();
+        
 
     },
     surrend: function(){
@@ -132,6 +142,7 @@ offlineController={
         this.reSizePoints(this.boardSize);
         this.startCountDown();
         this.timer(offlineController.time);
+        
 
         
     },
@@ -163,10 +174,10 @@ $('#offline_btn').on('click',function(){
         }else{
             offlineController.destroy();
         }
-        mui.viewport.showPage("menu-page", "SLIDE_RIGHT")
+        mui.viewport.showPage("menu_page", "SLIDE_RIGHT")
     }else{
         offlineController.destroy();
-        mui.viewport.showPage("menu-page", "SLIDE_RIGHT")
+        mui.viewport.showPage("menu_page", "SLIDE_RIGHT")
         $(this).addClass('offline_surrend_btn').text('Surrend').removeClass('offline_back_btn')
     }
 });

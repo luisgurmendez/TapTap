@@ -1,5 +1,6 @@
 function checkChallenge(challenge){
 	completed=true;
+	board=$('#online_board')
 	switch(challenge){
 
 	case 'square':
@@ -7,13 +8,13 @@ function checkChallenge(challenge){
 			$(this).children('td').each(function(x){
 				point = $(this).children().children();
 				if(y==0 || y==boardSize-1){
-					if(point.data('user_id')!=user_id){
+					if(point.data('user_id')!=onlineController.user_id){
 						completed=false;
 						return completed;
 					}
 				}else{
 					if(x==0 || x==boardSize){
-						if(point.data('user_id') != user_id){
+						if(point.data('user_id') != onlineController.user_id){
 							completed=false;
 							return completed;
 						}

@@ -23,9 +23,7 @@ function deviceReady() {
 		//Hide splash.
 		//Ocultar el splash.
 		if (navigator.splashscreen) {
-			setTimeout(function() {	//setTimeout is optional. SetTimeout es opcional.
-				navigator.splashscreen.hide();
-			}, 2000);
+			navigator.splashscreen.hide();
 		}
 		
 

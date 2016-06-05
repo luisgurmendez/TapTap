@@ -57,10 +57,10 @@ $(document).ready(function() {
         mui.viewport.showPage('register_page','SLIDE_LEFT')
     });
     $(document).ajaxStart(function() {
-        $(".loadingGif").css("display", "block");
+        $("#loadingGif").css("display", "block");
     });
     $(document).ajaxComplete(function() {
-        $(".loadingGif").css("display", "none");
+        $("#loadingGif").css("display", "none");
     });
 });
 

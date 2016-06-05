@@ -5,8 +5,9 @@
 
 
 
+
+
 window_height=$(window).height()-$(window).height()*0.2;
-console.log(window_height);
 $("#challenges_container").css("height", window_height);
 $("#challenges_container").css("max-height", window_height);
 $(".challenge").height($($(".challenge")[0]).innerWidth());
@@ -15,22 +16,26 @@ var challengesTotalNumber = 10;
 
 var challengesTest = [];
 
-$.ajax({
-    type : 'GET',
-    async : false,
-    url : 'http://localhost:8080/Game/rest/challenges/Nicolas',
-    success : function(challenges) {
-        challengesTest = challenges;
-        run()
-        $('.challenge .challenge_img').css('height',$($(".challenge > .challenge_img")[0]).height())
+function getChallenges(){
+    
+    $.ajax({
+        type : 'GET',
+        async : false,
+        dataType: 'json',
+        url : 'http://taptap.ddns.net:8080/Game/rest/challenges/byUserName',
+        success : function(challenges) {
+            challengesTest = challenges;
+            run()
+            $('.challenge .challenge_img').css('height',$($(".challenge > .challenge_img")[0]).height())
+        },
+        error : function(jqXHR, textStatus, errorThrown) {
+            alert('An error has occurred!' + errorThrown + "+++" + JSON.stringify(jqXHR));
+            console.log(jqXHR,textStatus,errorThrown)
+        }
 
-    },
+    });
+}
 
-    error : function() {
-        alert('An error has occurred!');
-    }
-
-});
 
 
 function makeChallenges (challenges){
@@ -114,7 +119,6 @@ function run() {
 //window.onload = run;
 
 $(window).on('resize', function(){
-    console.log("Caca")
     $('.cahllenge .challenge_img').css('height','80%');
     //$('.challenge .challenge_img').css('height',$($(".challenge > .challenge_img")[0]).height())
 })
