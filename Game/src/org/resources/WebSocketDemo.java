@@ -18,6 +18,7 @@ import javax.websocket.server.ServerEndpoint;
 import org.controllers.ChallengeController;
 import org.json.JSONObject;
 import org.models.Game;
+import org.services.UserService;
 
 @ServerEndpoint("/gameWS")
 public class WebSocketDemo {
@@ -98,6 +99,7 @@ public class WebSocketDemo {
 	
 	@OnMessage
 	public void gotAMessage(Session session, String msg) {
+		System.out.println(msg);
 		if (msg != null) {
 			JSONObject json = new JSONObject(msg);
 			System.out.println(json.toString());
@@ -131,6 +133,22 @@ public class WebSocketDemo {
 						+ ", \"userId\":" + json.getInt("userId") + "}";
 			} else if (action.equals("timeIsOver")) {
 				textToSend = "{\"action\":\"timeIsOver\"}";
+			} else if(action.equals("winner")){
+				// msj = {'action':'winner','my_username':username,'winner_username':winner_player, + 
+				// 'challenge_completed':challenge_completed,'challenge':'CUADRADO','score':score}
+
+				String winner = json.getString("winner_username");
+				String username = json.getString("my_username");
+				if(winner==null){
+					//HACER ESTE METODO!
+					//UserService.getInstance().updateMatchesPlayed(username);
+				}else{
+				
+					long score = json.getLong("score");
+					boolean challengeCompleted = json.getBoolean("challenge_completed");
+					String challenge = json.getString("challenge");
+					//UserService.getInstance().updateWinnerInfo(username,score,challenge_completed,challenge);
+				}		
 			}
 			if (textToSend != null) {
 				Game newGame = sessionGame.get(session);

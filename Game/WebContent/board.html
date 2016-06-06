@@ -393,24 +393,42 @@
 	       }
 	     })
 	   }); */
-
+	   var winner_player;
 	   if(mine > his) {
 		   if(!alerted){
 	    		alert("You won!");
 	    		alerted=true
+	    		
 	    	 }
+		   winner_player=username;
 	   }else if(mine < his){
 		   if(!alerted){
 	    		alert("You lost!");
 	    		alerted=true
 	    	 }
+		   winner_player=opponent_username;
 	   }else{
 		   if(!alerted){
 	    		alert("Draw");
 	    		alerted=true
 	    	 }
+		   winner_player=null;
 	   }
+	   console.log(dataController);
+	   if(winner_player==username){
+		   var score=dataController.my_point_count_overall;
+		   //score += challenge.score
+		   alert('Add Challenge score to score')
+		   msj = {'action':'winner','my_username':username,'winner_username':winner_player,'challenge_completed':challenge_completed,'challenge':'CUADRADO','score':score}
+		   doSend(msj);
+	   }else{
+		   msj={'action':'winner', 'winner_username':null, 'my_username':username}
+		   doSend(msj);
+	   }
+	  
 	 }
+   
+  
   // Sends game over data thorugh webSocket
   function sendGameOver(){
     message={'action':'timeIsOver'};
