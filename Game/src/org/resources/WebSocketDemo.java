@@ -99,7 +99,6 @@ public class WebSocketDemo {
 	
 	@OnMessage
 	public void gotAMessage(Session session, String msg) {
-		System.out.println(msg);
 		if (msg != null) {
 			JSONObject json = new JSONObject(msg);
 			System.out.println(json.toString());
