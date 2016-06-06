@@ -136,17 +136,21 @@ public class WebSocketDemo {
 				// msj = {'action':'winner','my_username':username,'winner_username':winner_player, + 
 				// 'challenge_completed':challenge_completed,'challenge':'CUADRADO','score':score}
 
-				String winner = json.getString("winner_username");
+				Object winnerObject = json.get("winner_username");
+				String winner;
+				if (winnerObject == null){
+					winner = null;
+				}else{
+					winner = json.getString("winner_username");
+				}
 				String username = json.getString("my_username");
 				if(winner==null){
-					//HACER ESTE METODO!
-					//UserService.getInstance().updateMatchesPlayed(username);
+					UserService.getInstance().updateMatchesPlayed(username);
 				}else{
-				
 					long score = json.getLong("score");
 					boolean challengeCompleted = json.getBoolean("challenge_completed");
 					String challenge = json.getString("challenge");
-					//UserService.getInstance().updateWinnerInfo(username,score,challenge_completed,challenge);
+					UserService.getInstance().updateWinnerInfo(username,score,challengeCompleted,challenge);
 				}		
 			}
 			if (textToSend != null) {

@@ -2,6 +2,7 @@ package org.services;
 
 import java.util.List;
 
+import org.daoObjects.ChallengeDAO;
 import org.daoObjects.PlayerDAO;
 import org.exchangableObjects.Player;
 import org.hibernate.Query;
@@ -85,6 +86,56 @@ public class UserService {
 			userExists = true;
 		}
 		return userExists;
+	}
+	
+	public void updateMatchesPlayed(String username) {
+		Session session = getSession();
+		String hql = "UPDATE PlayerDAO p SET p.matchesPlayed = p.matchesPlayed + 1 "
+				+ "WHERE p.username = :username";
+		Query query = session.createQuery(hql);
+		session.beginTransaction();
+		query.setParameter("username", username);
+		query.executeUpdate();
+		session.getTransaction().commit();
+	}
+	
+	// El score ya me lo pasan completo (puntos pintados + desafío en caso de que se haya cumplido)
+	public void updateWinnerInfo(String username, long score,
+			boolean challengeCompleted, String challenge) {
+		Session session = getSession();
+		String hql = "UPDATE PlayerDAO p SET p.matchesPlayed = p.matchesPlayed + 1, "
+				+ "p.matchesWon = p.matchesWon + 1, p.points = p.points + :score WHERE p.username = :username";
+		Query query = session.createQuery(hql);
+		session.beginTransaction();
+		query.setParameter("username", username);
+		query.setParameter("score", score);
+		query.executeUpdate();
+		if (challengeCompleted){
+			updateChallengeCompleted(username, challenge, session);
+		}
+		session.getTransaction().commit();
+	}
+	
+	private void updateChallengeCompleted(String username, String challenge, Session session){
+		String hql = "SELECT p FROM PlayerDAO p WHERE p.username = :username";
+		Query query = session.createQuery(hql);
+		query.setParameter("username", username);
+		@SuppressWarnings("unchecked")
+		List<PlayerDAO> users = query.list();
+		String hql2 = "SELECT c FROM ChallengeDAO c WHERE c.name = :challenge";
+		Query query2 = session.createQuery(hql2);
+		query2.setParameter("challenge", challenge);
+		@SuppressWarnings("unchecked")
+		List<ChallengeDAO> challenges = query2.list();
+		ChallengeDAO challengeDone = null;
+		for (ChallengeDAO challengeDAO : challenges) {
+			challengeDone = challengeDAO;
+		}
+		for (PlayerDAO playerDAO : users) {
+			if (challengeDone != null){
+				playerDAO.getDoneChallenges().add(challengeDone);
+			}
+		}
 	}
 	
 	private Session getSession(){ 
