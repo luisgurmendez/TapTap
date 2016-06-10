@@ -109,7 +109,7 @@
 	$.ajax({
 		type : 'GET',
 		async : false,
-		url : 'http://taptap.ddns.net:8080/Game/rest/challenges/Nicolas',
+		url : 'http://taptap.ddns.net:8080/Game/rest/challenges/byUsername',
 		success : function(challenges) {
 			challengesTest = challenges;
 			run()
@@ -118,7 +118,7 @@
 		},
 		
 		error : function() {
-			alert('An error has occurred!');
+			alert('An error has occurred! MErda');
 		}
 		
 	});

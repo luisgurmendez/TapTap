@@ -216,7 +216,7 @@
   function startConnection() {
     websocket= new WebSocket(wsUri)
     websocket.onopen = function(evt) {
-    	console.log('Web socket on Open');
+    	
         joinGame(getURLVariable("id"))
     };
     websocket.onmessage = function(evt) {
@@ -226,7 +226,7 @@
       	onError();
     };
     websocket.onclose = function(evt){
-    	console.log('Web socket closed')
+    	
     	endGame();
     };
   }
@@ -237,7 +237,7 @@
 
   function onMessage(evt) {
 	json = JSON.parse(evt.data);
-	console.log("onMessage " + evt.data)
+	
     action = json.action
     if(action=="paintedSpot"){
       paintSpot(json.x,json.y,json.userId)
@@ -276,8 +276,8 @@
     if(!can_zoom){
     	e.preventDefault();
     }
-    console.log("touchmove")
-    console.log(e)
+    
+   
   }, false);
 
   function sendSpecifications(){
@@ -292,7 +292,6 @@
   
   function joinGame(game_id){
 	  message={'action':'join','gameId':game_id, 'username':username}
-	  console.log(message);
 	  doSend(message);
   }
   
@@ -414,7 +413,7 @@
 	    	 }
 		   winner_player=null;
 	   }
-	   console.log(dataController);
+	   
 	   if(winner_player==username){
 		   var score=dataController.my_point_count_overall;
 		   //score += challenge.score

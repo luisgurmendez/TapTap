@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.websocket.OnClose;
+import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
@@ -100,6 +101,7 @@ public class WebSocketDemo {
 	@OnMessage
 	public void gotAMessage(Session session, String msg) {
 		if (msg != null) {
+			System.out.println(msg);
 			JSONObject json = new JSONObject(msg);
 			System.out.println(json.toString());
 			String action = json.getString("action");
@@ -171,9 +173,24 @@ public class WebSocketDemo {
 	public void closeConnection(Session userSession) {
 		allSessions.remove(userSession);
 		Game game = findGame(userSession);
-		// MANEJAR CUANDO SE DESCONECTA Y ESTA ESPERANDO JUGADOR O ESTA JUGANDO
+		for(Session s:game.getSessions()){
+			if(s == null){
+				for(int i=games.size()-1 ; i>=0; i--){
+					if(games.get(i).equals(game)){
+						games.remove(i);
+					}
+				}
+			}
+		}
+		
+		
 		game.setRunning(false);
 
+	}
+	
+	@OnError
+	public void error(Session userSession, Throwable t){
+		
 	}
 
 	private void sendStartGame(Game game) {

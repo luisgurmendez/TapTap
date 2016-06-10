@@ -18,16 +18,16 @@
   	</div>
   	
   	 <div id="challenges" align="center">
-		<a href="#" class="button">Challenges</a>
+		<a href="challengesPage.html" class="button">Challenges</a>
 	 </div>
 	 
   	 <div id="statistics" align="center">
-		<a href="#" class="button">Statistics</a>
+		<a href="statistics.html" class="button">Statistics</a>
 	 </div>
 	 
   	 <div id="inferior_buttons">
 		<a href="#" class="button1" id="logout">Logout</a>
-		<a href="#" class="button1" id="menu">Menu</a>
+		<a href="menu.html" class="button1" id="menu">Menu</a>
 	 </div>
 	 
 </body>
@@ -131,7 +131,7 @@ img {
    }
  }
 </style>
-
+<script src="scripts/plugins/jquery-2.2.2.js"></script>
 <script>
 	var userTest = {"username":"santiago", "userscore":"34356"};
 	
@@ -147,7 +147,7 @@ img {
 				+ '</div>'
 				+ ' '
 				+ '<div id="user_score" align="center">'
-				+ 'score: ' + userdata.userscore
+				+ 'score: ' + userdata.points
 				+ '</div>'
 				+ ' '
 				
@@ -169,9 +169,25 @@ img {
 	// Esta función será la que ejecute todo.
 	
 	function run() {
-	    var profileHtml = makeProfile(userTest);
-	    
-	    insertHTML('user_container', profileHtml);
+		
+		$.ajax({
+			url:"http://taptap.ddns.net:8080/Game/rest/users/userInformation",
+			type:"GET",
+			success: function(user){
+
+				console.log(user)
+			    var profileHtml = makeProfile(user);
+			    
+			    insertHTML('user_container', profileHtml);
+			},
+			error: function(){
+				alert('Error at userinfo request')
+			}
+			
+			
+		})
+		
+		
 	}
 
 	// Corre todo cuando carga el documento.
