@@ -3,22 +3,10 @@
  */
 
 
-user=mui.localStorage.get('user')
-if(user != null){
-    if(user.loged_in){
-        mui.viewport.showPage('menu_page','NONE')
-    }else{
-        mui.viewport.showPage('login_page','NONE')
-        $('#login_username').val(user.username)
-    }
-}
-
-
 $(document).ready(function() {
     var address = "http://taptap.ddns.net:8080/Game/rest/users";
     $("#login_btn").click(function(event) {
         event.preventDefault();
-        console.log($('#login_username'))
         var username = $("#login_username").val();
         var password = $("#login_password").val();
         $(".errorMessage").css("display", "none");

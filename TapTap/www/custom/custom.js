@@ -25,7 +25,22 @@ function deviceReady() {
 		if (navigator.splashscreen) {
 			navigator.splashscreen.hide();
 		}
-		
+
+
+		user=mui.localStorage.get('user')
+		if(user != null){
+			if(user.loged_in){
+				mui.viewport.showPage('menu_page','NONE')
+			}else{
+				mui.viewport.showPage('login_page','NONE')
+				$('#login_username').val(user.username)
+			}
+		}else{
+			mui.viewport.showPage('login_page','NONE')
+		}
+
+
+
 
 	} catch (e) {
 		//your decision
@@ -44,12 +59,6 @@ function installEvents() {
 	//Back button.
 	$(".mui-backarrow").click(function() {
 		mui.history.back();
-		return false;
-	});
-	
-	//Open menu.
-	$(".mui-headmenu").click(function() {
-		mui.screen.showPanel("menu-panel", "SLIDE_LEFT");	//ATTENTION!!! mui.screen instead of mui.viewport
 		return false;
 	});
 

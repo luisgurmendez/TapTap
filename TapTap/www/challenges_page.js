@@ -12,28 +12,31 @@ $("#challenges_container").css("height", window_height);
 $("#challenges_container").css("max-height", window_height);
 $(".challenge").height($($(".challenge")[0]).innerWidth());
 
-var challengesTotalNumber = 10;
+var challengesTotalNumber = 20;
 
 var challengesTest = [];
 
 function getChallenges(){
-    
+    var username=mui.localStorage.get('user').username
+
     $.ajax({
         type : 'GET',
         async : false,
         dataType: 'json',
-        url : 'http://taptap.ddns.net:8080/Game/rest/challenges/byUsernameApp/Nicolas' ,
+        url : 'http://taptap.ddns.net:8080/Game/rest/challenges/byUsernameApp/' + username ,
         success : function(challenges) {
             challengesTest = challenges;
             run()
             $('.challenge .challenge_img').css('height',$($(".challenge > .challenge_img")[0]).height())
         },
         error : function(jqXHR, textStatus, errorThrown) {
-            alert('An error has occurred!' + errorThrown + "+++" + JSON.stringify(jqXHR));
-            console.log(jqXHR,textStatus,errorThrown)
+            mui.alert('An error has occurred!' + errorThrown + "+++" + JSON.stringify(jqXHR));
         }
 
     });
+
+    $('.challenge .challenge_img').css('height',$($(".challenge > .challenge_img")[0]).height())
+    
 }
 
 
@@ -111,7 +114,9 @@ function insertHTML(id, html) {
 // Esta función será la que ejecute todo.
 function run() {
     var challengesHtml = makeChallenges(challengesTest);
-    insertHTML('challenges_container', challengesHtml);
+    $('#challenges_container .mui-scroll-wrapper div').html(challengesHtml)
+    mui.viewport.refreshScroll('challenges_page')
+
 
 }
 

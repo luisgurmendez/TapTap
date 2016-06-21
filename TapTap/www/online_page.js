@@ -13,13 +13,15 @@ onlineController={
     windows_width: $( window ).width(),
     boardSize: 5,
     time: 30,
+    challengeObjt:null,
+    challenge_db_name:"",
     challenge: null,
     challenge_completed: false,
     id_timer: 0,
     id_countdown: 0,
     room_id: null,
     paused: true,
-    username: mui.localStorage.get('user').username,
+    username: null,
     opponent_username: null,
     dataController: new DataController(),
     generateBoard: function(){
@@ -40,21 +42,37 @@ onlineController={
 
         mine=this.dataController.my_point_count
         his=this.dataController.opponent_point_count
+        winner_player=null
         if(mine > his) {
             if(!this.alerted){
                 alert("You won!");
                 this.alerted=true
+                winner_player=this.username;
             }
         }else if(mine < his){
             if(!this.alerted){
                 alert("You lost!");
                 this.alerted=true
+                winner_player=this.opponent_username;
             }
         }else{
             if(!this.alerted){
                 alert("Draw");
                 this.alerted=true
             }
+        }
+        if(winner_player==this.username){
+            score=0
+            score=this.dataController.my_point_count_overall;
+
+            score += this.challengeObjt.points
+
+            msj = {'action':'winner','my_username':this.username,'winner_username':winner_player,'challenge_completed':this.challenge_completed,'challenge':this.challenge_db_name,'score':score}
+            console.log(msj)
+            this.doSend(msj);
+        }else{
+            msj={'action':'winner', 'winner_username':null, 'my_username':this.username}
+            this.doSend(msj);
         }
     },
     colorController:{
@@ -104,28 +122,87 @@ onlineController={
         }, 1000);
     },
     startConnection: function() {
-        this.websocket= new WebSocket(this.wsUri)
-        this.websocket.onopen = function(evt) {
+        this.websocket = new WebSocket(this.wsUri)
+        this.websocket.onopen = function (evt) {
             //this.joinGame(getURLVariable("id"))
-            if(onlineController.room_id != null){
+            if (onlineController.room_id != null) {
                 onlineController.joinGame(onlineController.room_id)
-            }else{
+            } else {
                 onlineController.joinGame(null);
 
             }
-            onlineController.room_id=null;
+            onlineController.room_id = null;
         };
-        this.websocket.onmessage = function(evt) {
+        this.websocket.onmessage = function (evt) {
             onlineController.onMessage(evt);
         };
-        this.websocket.onerror = function(evt) {
+        this.websocket.onerror = function (evt) {
             onlineController.onError();
         };
-        this.websocket.onclose = function(evt){
-            alert("WS closed.")
+        this.websocket.onclose = function (evt) {
+            mui.toast("WS closed",'middle','short')
         };
+        this.username = mui.localStorage.get('user').username
         $("#self_username").text(this.username)
-        this.username=mui.localStorage.get('user').username
+        this.getNextChallenge()
+
+    },
+    getNextChallenge: function(){
+        if(this.username != null){
+            $.ajax({
+                type: 'GET',
+                url: 'http://taptap.ddns.net:8080/Game/rest/challenges/nextChallengeApp/' + this.username,
+                success: function(challenge){
+
+                    onlineController.challenge_db_name=challenge.name
+                    onlineController.challengeObjt=challenge
+                    switch(challenge.name){
+                        case "CRUZ PEQUEÑA":
+                            challenge.name='small cross'
+                            break;
+                        case "CRUZ":
+                            challenge.name='cross'
+                            break;
+                        case "DIAGONALES":
+                            challenge.name='diagonals'
+                            break;
+                        case "ESQUINAS":
+                            challenge.name='corners'
+                            break;
+                        case "CUADRADO":
+                            challenge.name='square'
+                            break;
+                    }
+
+                    onlineController.challenge = challenge.name
+                    html = '<span>Next Challenge: </span><div class="next_challenge">'
+                        + ''
+                        + '<div class="next_challenge_img" align="center">'
+                        + '<img src="data:image/png;base64,' + challenge.image + '" alt="challenge_fail"  align="middle">'
+                        + '</div>'
+                        + ''
+                        + '<div class="next_challenge_data" align="center">'
+                        + '<div class="next_challenge_name" align="center">'
+                        + challenge.name
+                        + '</div>'
+                        + '<div class="next_challenge_score" align="center">'
+                        + challenge.points
+                        + '</div>'
+                        + '</div>'
+                        + '</div>'
+                        + ''
+                    $('#next_challenge_container').html(html);
+                    $('.next_challenge .next_challenge_img img').css('max-height','50%')
+                    $('.next_challenge .next_challenge_img img').css('max-width','50%')
+
+                },
+                error: function(){
+                    $('#next_challenge_container').innerHTML="Error";
+                }
+
+            })
+
+        }
     },
     onMessage: function(evt) {
         json = JSON.parse(evt.data);
@@ -141,12 +218,12 @@ onlineController={
             this.boardSize = json.matrixSize;
             this.user_id = json.userId;
             this.time = json.time;
+            console.log(json)
             this.challenge = json.challenge;
 
         } else if (action == "opponentEnterRoom") {
             $('#opponent_point_div').css('background', '#bbbbbb')
             this.opponent_id = json.userId;
-            alert(JSON.stringify(json))
             this.opponent_username = json.username;
             $('#status_message').text(this.opponent_username);
         }
@@ -243,6 +320,10 @@ onlineController={
         $('#status_message').show();
         $('#opponent_point_div').css('background', 'url(ajax-loader.gif) no-repeat center center')
         this.opponent_id = 0;
+        this.dataController.reset();
+        $('#online_timer_container .point_count_self span').text(0);
+        $('#online_timer_container .point_count_opponent span').text(0);
+        $('#next_challenge_container').html('<span>Next Challenge: </span>')
     },
     resumeGame: function(){
         this.startCountDown();
@@ -305,7 +386,7 @@ $('#ready_to_play').on('tap', function(){
         onlineController.sendStartGame();
 
     }else{
-        alert('Select a Color!')
+        mui.toast('Select a Color!','middle','short')
     }
 });
 
@@ -327,7 +408,7 @@ $('#online_board').on('tap','.point',function(){
         onlineController.sendPoint(cell.data('x'),cell.data('y'));
         if(!onlineController.challenge_completed){
             if(checkChallenge(onlineController.challenge)){
-                alert("Challenge Completed!!")
+                mui.toast("Challenge Completed!!",'bottom','short')
                 onlineController.challenge_completed=true;
             }
         }

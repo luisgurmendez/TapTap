@@ -88,6 +88,7 @@ offlineController={
         clearInterval(offlineController.id_timer);
         clearInterval(offlineController.id_countdown);
         $('#timer_offline').text(0)
+        this.dataController.reset();
 
     },
     // Re size point, for diferent screen sizes
